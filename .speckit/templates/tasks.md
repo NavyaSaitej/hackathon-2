@@ -17,11 +17,14 @@
 - `[ ]` Implement the strict OOV/mixed-script fallback mechanism (`<UNK>` mapping).
 - `[ ]` Define Pydantic models (`Flashcard`, `Deck`) to rigidly enforce the LLM's JSON output structure.
 - `[ ]` Integrate the LLM API call in the backend, passing the Pydantic schema.
+- `[ ]` Implement explicit backend memory garbage collection (Zero Retention) to drop transcripts post-generation.
 
 ## Phase 4: Frontend / Application Layer
 - `[ ]` Scaffold main UI layout (Vanilla HTML/CSS).
 - `[ ]` Implement specific UI error states (e.g., "Video too short", "Rate Limited", "No Captions").
+- `[ ]` Implement Progressive Loading UX ("Fetching..." -> "Analyzing..." -> "Generating...") to mask backend latency.
 - `[ ]` Implement the 3D CSS flip animation for the flashcards.
+- `[ ]` Implement the "Export to Anki" button to generate a downloadable `.txt` (TSV) file.
 - `[ ]` Ensure keyboard navigability (Tab to focus, Enter/Space to flip) for WCAG 2.1 AA compliance.
 - `[ ]` Integrate UI with the backend FastAPI endpoint via async `fetch`.
 

@@ -15,6 +15,7 @@ The application consists of a lightweight Vanilla frontend that communicates wit
 ## 3. Data Ingestion & Governance Strategy
 - **Lineage & Ingestion:** Fetched directly from YouTube. Prefers manual `en` captions, falls back to `a.en` (auto-generated). *Risk Note: YouTube may rate-limit datacenter IPs, so we rely on the library's built-in proxy support if needed.*
 - **PII Scrubbing:** `presidio-analyzer` will sanitize text. Compiled Python Regex pipeline is the strict fallback.
+- **Zero Retention Policy:** The backend operates purely in memory. Transcripts and generated JSON are explicitly garbage-collected and never written to a database or persistent log file.
 - **Failure Modes:** Explicit 400 Bad Request on: missing captions, video > 20 mins, malformed URL, or word count < 100. No silent data drops.
 - **Security & Secrets:** Strict CORS middleware ensures only the Vercel frontend domain can access the backend. All Gemini API keys must be loaded via `.env` and injected securely at runtime.
 - **Rate Limiting:** `slowapi` (or similar simple rate limiter) will enforce the 5 requests/hr IP limit.
@@ -48,3 +49,4 @@ The application consists of a lightweight Vanilla frontend that communicates wit
 - **Methodology:** Automated unit testing via `pytest` for the PII scrubber, OOV fallback logic, and Pydantic schema validation.
 - **Deployment:** Vercel (Frontend) and Render (Backend).
 - **Cold-Start Mitigation:** Render's free tier sleeps after 15 mins. A cron job (e.g., UptimeRobot) must be configured to ping the backend every 14 minutes during the hackathon demo period to prevent 50-second wake-up latencies.
+- **UX Milestone Strategy:** To mask the 15-second latency, the frontend will implement "Progressive Loading" states (e.g., swapping text from "Fetching..." -> "Analyzing..." -> "Generating...") rather than a static spinner.

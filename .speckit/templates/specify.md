@@ -19,8 +19,9 @@ Students and self-learners spend an inordinate amount of time manually creating 
 2. The system must extract the English transcript. It must prioritize manual captions, falling back to auto-generated. If neither exists, OR if the transcript contains fewer than 100 words (e.g., a music video), it must explicitly crash with a logged 400 error.
 3. The system must process the transcript to generate dynamic flashcards: 3 cards for videos under 5 mins, and 5 cards per 10 minutes for longer videos.
 4. The system must render these pairs as interactive, flippable digital cards in the browser, with specific error UI states for invalid videos.
-5. **Accessibility:** The UI must adhere to WCAG 2.1 AA standards (keyboard navigability).
-6. **[Security] Rate Limiting:** The API must limit users to 5 generations per IP per hour to prevent API credit abuse during the hackathon.
+5. **[New] Export to Anki:** The system must provide a 1-click button to download the flashcard deck as a `.txt` file formatted specifically for Anki import (tab-separated values).
+6. **Accessibility:** The UI must adhere to WCAG 2.1 AA standards (keyboard navigability).
+7. **[Security] Rate Limiting:** The API must limit users to 5 generations per IP per hour to prevent API credit abuse during the hackathon.
 
 ## 5. Data Governance & Privacy (Mandatory)
 - **Data Sources:** Public YouTube transcripts via `youtube-transcript-api`. LLM generation via Gemini APIs.
