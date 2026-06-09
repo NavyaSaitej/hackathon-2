@@ -1,6 +1,6 @@
 # Specification
 
-**Project Name:** Video-to-Flashcards Auto-Study Buddy
+**Project Name:** QuickCards
 **Date:** 2026-06-09
 
 ## 1. Executive Summary

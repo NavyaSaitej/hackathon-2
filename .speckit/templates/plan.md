@@ -1,6 +1,6 @@
 # Technical Architecture Blueprint
 
-**Project Name:** Video-to-Flashcards Auto-Study Buddy
+**Project Name:** QuickCards
 **Status:** APPROVED
 
 ## 1. System Overview
