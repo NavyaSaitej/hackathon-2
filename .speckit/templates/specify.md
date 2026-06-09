@@ -11,22 +11,22 @@ Students and self-learners spend an inordinate amount of time manually creating 
 
 ## 3. Scope & Audience
 - **Primary Users:** High school/college students and self-directed learners.
-- **Language Scope:** English (Primary), with potential for multilingual transcript support.
+- **Language Scope:** English (Primary), Multilingual support via strict transliteration.
 - **Platform Scope:** Web Browser (Mobile-responsive).
 
 ## 4. Functional Requirements
-1. The system must accept a valid YouTube URL as input.
-2. The system must successfully extract the English transcript/captions for the provided video.
-3. The system must process the transcript to generate exactly 5 to 10 distinct Question & Answer pairs.
+1. The system must accept a valid YouTube URL and validate its format using regex.
+2. The system must extract the English transcript/captions for the provided video. If captions are unavailable, it must explicitly crash with a logged error.
+3. The system must process the transcript to generate exactly 5 Question & Answer pairs per 10 minutes of video.
 4. The system must render these pairs as interactive, flippable digital cards in the browser.
 
 ## 5. Data Governance & Privacy (Mandatory)
-- **Data Sources:** Public YouTube transcripts via rapid API or lightweight proxy. LLM generation via OpenAI/Gemini APIs.
-- **PII Risk Level:** Low. Educational videos typically do not contain PII.
-- **Scale:** Small scale per request (max ~15-minute video transcripts, roughly 2,000-3,000 words).
-- **Format Constraints:** Standard UTF-8 text.
+- **Data Sources:** Public YouTube transcripts via `youtube-transcript-api`. LLM generation via Gemini APIs.
+- **PII Risk Level:** Low/Medium. While educational videos rarely contain PII, all raw transcripts must pass through an explicit regex-based PII scrubbing pipeline (removing emails/phone numbers) before LLM ingestion.
+- **Scale:** Maximum video length enforced at 20 minutes (approx. 3,000 words).
+- **Format Constraints:** Standard UTF-8 text. Mixed scripts must use strict transliteration libraries.
 
 ## 6. Success Metrics & Benchmarks
-- **AI/LLM Benchmarks:** Flashcard generation latency must be < 15 seconds.
-- **Software Metrics:** Page load time < 1.5s.
-- **Business/User Metrics:** Flawless generation of a 5-card deck from a standard 10-minute educational video.
+- **AI/LLM Benchmarks:** Flashcard generation end-to-end latency < 15.0 seconds. Token processing speed > 100 tokens/sec.
+- **Software Metrics:** Initial page load time < 1.5 seconds.
+- **Business/User Metrics:** Generates exactly a 5-card deck from a standard 10-minute video with 0 data extraction failures on captioned videos.

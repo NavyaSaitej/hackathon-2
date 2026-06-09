@@ -2,28 +2,29 @@
 
 ## Phase 1: Environment & Reproducibility
 - `[ ]` Scaffold repository structure (`frontend/` and `backend/`).
-- `[ ]` Lock backend dependencies (`requirements.txt`).
-- `[ ]` Configure deterministic LLM API settings.
+- `[ ]` Initialize and strictly lock backend dependencies using `uv init` and `uv.lock`.
+- `[ ]` Set up deterministic seed configurations (`seed=42`) and temperature settings (`0.0`) in the LLM utility.
 
 ## Phase 2: Data Governance & Ingestion
-- `[ ]` Implement YouTube URL parser and validator.
+- `[ ]` Implement YouTube URL parser and validator (max length 20 mins).
 - `[ ]` Implement `youtube-transcript-api` integration in the backend.
-- `[ ]` Implement hard-failure logic for "No Subtitles Found" errors.
+- `[ ]` Implement the PII scrubbing pipeline (Regex for emails/phones).
+- `[ ]` Implement hard-failure / dead-letter logic for "No Subtitles Found" errors.
 
 ## Phase 3: AI / Model Layer
+- `[ ]` Implement the strict OOV/mixed-script fallback mechanism (`<UNK>` mapping).
 - `[ ]` Write the strict JSON-enforced system prompt for flashcard generation.
 - `[ ]` Integrate the LLM API call in the backend.
-- `[ ]` Create a mock endpoint returning static JSON for UI development.
 
 ## Phase 4: Frontend / Application Layer
-- `[ ]` Build the `index.html` UI layout (URL input, loading states).
+- `[ ]` Scaffold main UI layout (Vanilla HTML/CSS).
 - `[ ]` Implement the 3D CSS flip animation for the flashcards.
-- `[ ]` Write `app.js` to fetch from the backend and dynamically render cards.
+- `[ ]` Integrate UI with the backend FastAPI endpoint.
 
 ## Phase 5: Rigorous Evaluation
-- `[ ]` Test with 5 distinct educational videos.
-- `[ ]` Verify cross-browser compatibility of the flip animation.
+- `[ ]` Execute unit tests against the PII pipeline and OOV mapping.
+- `[ ]` Test end-to-end latency with a 10-minute video to ensure it meets the < 15.0 seconds benchmark.
 
 ## Phase 6: Documentation & Handoff
-- `[ ]` Write `README.md` with explicit local run instructions.
-- `[ ]` Create `walkthrough.md`.
+- `[ ]` Write `README.md` with explicit `uv run` reproduction instructions.
+- `[ ]` Generate `walkthrough.md`.
