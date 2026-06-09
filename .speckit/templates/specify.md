@@ -1,6 +1,6 @@
 # Specification
 
-**Project Name:** QuickCards (V4 - Enterprise Compliance)
+**Project Name:** QuickCards (V5 - Ultimate Edition)
 **Date:** 2026-06-09
 
 ## 1. Executive Summary
@@ -22,8 +22,8 @@ Students spend too much time manually creating notes. Standard flashcard apps ar
 5. **Contextual Timestamps:** Cards sync with an embedded `youtube-nocookie.com` PiP player.
 6. **Export to Anki:** 1-click download to `.txt`.
 7. **Progressive Web App (PWA):** Must include a Service Worker (`sw.js`) and manifest for offline caching and home-screen installation.
-8. **Accessibility:** UI adheres to WCAG 2.1 AA standards.
-9. **Rate Limiting:** Maximum 5 generations per IP per hour.
+8. **Accessibility:** UI adheres to WCAG 2.1 AA standards. Includes strict ARIA toggling on 3D flips so screen readers don't read hidden text.
+9. **Reliability & Rate Limiting:** Max 5 generations per IP per hour. LLM API calls must use a 3-retry exponential backoff circuit breaker.
 
 ## 5. UI & Design Strategy
 - **Aesthetic:** Premium Dark Mode Glassmorphism.
@@ -33,6 +33,7 @@ Students spend too much time manually creating notes. Standard flashcard apps ar
 - **Data Sources:** Public YouTube transcripts. Gemini APIs.
 - **PII Scrubbing:** `presidio-analyzer` sanitization.
 - **Strict Gitignore:** `.env` keys must never be committed.
+- **App-to-App Security:** The backend explicitly requires an `X-App-Secret` token header to prevent direct Postman/cURL API abuse.
 
 ## 7. Success Metrics & Benchmarks
 - **AI/LLM Benchmarks:** End-to-end latency < 15.0 seconds. 

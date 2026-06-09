@@ -1,14 +1,14 @@
 # Technical Architecture Blueprint
 
-**Project Name:** QuickCards (V4 - Enterprise Compliance)
+**Project Name:** QuickCards (V5 - Ultimate Edition)
 **Status:** APPROVED
 
 ## 1. System Overview
-The application consists of an installable PWA Vanilla frontend and a Dockerized FastAPI backend, wired into a strict Swecha GitLab CI/CD pipeline.
+The application consists of a modular PWA Vanilla frontend and a Dockerized FastAPI backend. The backend incorporates structured logging (`loguru`), Pydantic schema enforcement, and an exponential backoff circuit breaker for Gemini API reliability.
 
 ## 2. Technology Stack Selection & Justification
-- **Frontend/UI:** Vanilla HTML5, CSS3, JavaScript. `sw.js` (Service Worker) for PWA.
-- **Backend/API:** Python, `fastapi`, `uvicorn`, Docker.
+- **Frontend/UI:** ES6 Vanilla JS Modules (`api.js`, `ui.js`, `state.js`, `video.js`). `sw.js` for PWA. Zero Node.js build step required.
+- **Backend/API:** Python, `fastapi`, `uvicorn`, Docker, `loguru` (Structured Logging).
 - **Data/AI Frameworks:** `youtube-transcript-api`, `google-genai`, `pydantic`.
 - **Code Quality/CI:** `biome` (JS Linting), `prettier`, `pre-commit`, `git-cliff` (Changelog), `gitlab-ci.yml`.
 
@@ -16,31 +16,38 @@ The application consists of an installable PWA Vanilla frontend and a Dockerized
 - **Transcript Chunking:** Backend chunks transcripts with `[TS_ID]` for accurate timestamping.
 - **Zero Retention Policy:** Transcripts and JSON are explicitly garbage-collected.
 - **Security & Privacy:** Strict CORS, `youtube-nocookie.com`, and strict `.gitignore`.
+- **App-to-App Handshake:** Frontend passes an `X-App-Secret` to block direct API abuse.
 
 ## 4. AI / Model Strategy
 - **Approach:** Zero-shot prompting with strict JSON schema enforcement using `pydantic` (`QuizCard`).
+- **Self-Correction Prompting:** The prompt instructs the LLM to verify distractors against transcript context to reduce hallucination.
 - **Base Model:** Gemini 1.5 Flash.
 
 ## 5. CSS / Performance Strategy
 - **Glassmorphism Guardrails:** `will-change: transform` on flipping cards.
+- **Accessibility Sync:** Dynamic `aria-hidden` toggling during CSS flips.
 
-## 6. Directory Structure (Swecha Compliance Standard)
+## 6. Directory Structure (Modular ES6 Standard)
 ```text
 .
 ├── .git/
-├── .husky/            # Git hooks
+├── .husky/            
 ├── .speckit/          
 ├── frontend/          
 │   ├── index.html
 │   ├── style.css
-│   ├── app.js         
-│   ├── sw.js          # PWA Service Worker
-│   └── manifest.json  # PWA Manifest
+│   ├── js/            # ES6 Modular Architecture
+│   │   ├── api.js     # Fetch and Error handling
+│   │   ├── ui.js      # DOM and ARIA manipulation
+│   │   ├── state.js   # 4-State Router logic
+│   │   └── video.js   # YouTube iframe API logic
+│   ├── sw.js          
+│   └── manifest.json  
 ├── backend/           
 │   ├── main.py        
 │   ├── scraper.py     
 │   ├── models.py      
-│   ├── Dockerfile     # Backend Containerization
+│   ├── Dockerfile     
 │   ├── .dockerignore
 │   └── uv.lock        
 ├── .env.example
@@ -48,12 +55,12 @@ The application consists of an installable PWA Vanilla frontend and a Dockerized
 ├── .eslintignore
 ├── .eslintrc.js
 ├── .gitignore
-├── .gitlab-ci.yml     # Swecha CI/CD
+├── .gitlab-ci.yml     
 ├── .pre-commit-config.yaml
 ├── .prettierrc
 ├── biome.json
 ├── cliff.toml
-├── package.json       # For frontend dev tooling
+├── package.json       
 ├── README.md
 ├── USER_MANUAL.md
 ├── AGENTS.md
@@ -68,4 +75,4 @@ The application consists of an installable PWA Vanilla frontend and a Dockerized
 
 ## 7. Evaluation Framework & Deployment
 - **Deployment:** Vercel (Frontend) and Render (Backend via Docker).
-- **CI/CD:** GitLab CI runs `biome`, `prettier`, and `pytest` on every push.
+- **CI/CD:** GitLab CI runs `biome`, `prettier`, and `pytest`.
