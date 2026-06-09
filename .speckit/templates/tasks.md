@@ -2,9 +2,10 @@
 
 ## Phase 1: Environment & Reproducibility
 - `[ ]` Scaffold repository structure (`frontend/` and `backend/`).
-- `[ ]` Initialize and strictly lock backend dependencies (`fastapi`, `uvicorn`, `youtube-transcript-api`, `pydantic`, `presidio-analyzer`) using `uv init` and `uv.lock`.
+- `[ ]` Initialize and strictly lock backend dependencies (`fastapi`, `uvicorn`, `youtube-transcript-api`, `pydantic`, `presidio-analyzer`, `slowapi`) using `uv init` and `uv.lock`.
+- `[ ]` Create `.env.example` for secure Gemini API key management.
 - `[ ]` Set up deterministic seed configurations (`seed=42`) and temperature settings (`0.0`) in the LLM utility.
-- `[ ]` Configure strict CORS middleware in `main.py` allowing only the frontend origin.
+- `[ ]` Configure strict CORS middleware and IP rate-limiting (`slowapi`) in `main.py`.
 
 ## Phase 2: Data Governance & Ingestion
 - `[ ]` Implement robust YouTube URL regex validator (supporting `youtu.be` and `watch?v=`). Enforce 20-min max length.
@@ -19,6 +20,7 @@
 
 ## Phase 4: Frontend / Application Layer
 - `[ ]` Scaffold main UI layout (Vanilla HTML/CSS).
+- `[ ]` Implement specific UI error states (e.g., "Video too short", "Rate Limited", "No Captions").
 - `[ ]` Implement the 3D CSS flip animation for the flashcards.
 - `[ ]` Ensure keyboard navigability (Tab to focus, Enter/Space to flip) for WCAG 2.1 AA compliance.
 - `[ ]` Integrate UI with the backend FastAPI endpoint via async `fetch`.
@@ -29,5 +31,6 @@
 - `[ ]` Run Google Lighthouse to verify 100% Accessibility score.
 
 ## Phase 6: Documentation & Handoff
-- `[ ]` Write `README.md` with explicit `uv run` reproduction instructions.
+- `[ ]` Write `README.md` with explicit `uv run` reproduction instructions and `.env` setup guide.
+- `[ ]` Configure UptimeRobot (or similar cron) to ping the Render backend every 14 minutes.
 - `[ ]` Generate `walkthrough.md`.
