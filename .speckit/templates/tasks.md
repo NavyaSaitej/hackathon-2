@@ -10,26 +10,24 @@
 ## Phase 2: Data Governance & Ingestion
 - `[ ]` Implement robust YouTube URL regex validator (Enforce 20-min max length).
 - `[ ]` Implement `youtube-transcript-api` integration.
-- `[ ]` **[V2]** Implement Transcript Chunker: Parse raw dictionary output into a text block annotated with precise timestamp IDs.
+- `[ ]` Implement Transcript Chunker: Parse raw dictionary into a text block annotated with timestamp IDs.
 - `[ ]` `[Requires Compute]` Implement the `presidio-analyzer` PII scrubbing pipeline.
 - `[ ]` Implement hard-failure / dead-letter logic (400 Bad Request).
 
 ## Phase 3: AI / Model Layer
 - `[ ]` Implement the strict OOV/mixed-script fallback mechanism (`<UNK>` mapping).
-- `[ ]` **[V2]** Define advanced Pydantic models (`QuizCard`, `Deck`) including distractors, explanations, and timestamp IDs.
+- `[ ]` Define advanced Pydantic models (`QuizCard`, `Deck`) including distractors, explanations, and timestamp IDs.
 - `[ ]` Integrate the LLM API call in the backend, passing the Pydantic schema (Single-Pass execution).
 - `[ ]` Implement explicit backend memory garbage collection (Zero Retention).
 
 ## Phase 4: Frontend / Application Layer
-- `[ ]` Scaffold main UI layout (Vanilla HTML/CSS).
-- `[ ]` Implement specific UI error states.
-- `[ ]` Implement Progressive Loading UX ("Fetching..." -> "Analyzing..." -> "Generating...").
-- `[ ]` **[V2]** Implement Quiz UI logic: Render multiple choice buttons, calculate local score, show explanation on failure.
-- `[ ]` **[V2]** Implement Contextual Deep Link: Render a `target="_blank"` YouTube link to the exact timestamp parsed from the LLM JSON.
-- `[ ]` Implement the 3D CSS flip animation for the flashcards.
-- `[ ]` Implement the "Export to Anki" button to generate a downloadable `.txt` (TSV) file.
-- `[ ]` Ensure keyboard navigability for WCAG 2.1 AA compliance.
-- `[ ]` Integrate UI with the backend FastAPI endpoint via async `fetch`.
+- `[ ]` Build the 4-State Vanilla JS Router (Landing, Loading, Quiz, Summary).
+- `[ ]` **Landing:** Add "Paste Demo URL" button and disable "Generate" until Regex validates input.
+- `[ ]` **Loading:** Implement Progressive Loading text ("Fetching..." -> "Analyzing..." -> "Generating...").
+- `[ ]` **Quiz:** Implement CSS Glassmorphism with `will-change: transform` performance protections.
+- `[ ]` **Quiz:** Implement colorblind-accessible feedback (Checkmark/X icons + color).
+- `[ ]` **Video:** Implement the collapsible PiP `youtube-nocookie.com` iframe embed. Link card flips to iframe API seeking.
+- `[ ]` **Summary:** Implement the "Export to Anki" button to generate a downloadable `.txt` (TSV) file.
 
 ## Phase 5: Rigorous Evaluation
 - `[ ]` Execute unit tests (`pytest`) against the PII pipeline, URL regex, and Timestamp Chunker.
