@@ -1,36 +1,36 @@
 # Specification
 
-**Project Name:** QuickCards
+**Project Name:** QuickCards (V2)
 **Date:** 2026-06-09
 
 ## 1. Executive Summary
-A web-based application designed to automatically generate interactive study flashcards from educational YouTube videos. By taking a YouTube URL as input, the system extracts the video transcript and uses a Large Language Model to identify key concepts, saving students hours of manual note-taking and improving learning retention.
+A web-based application designed to automatically generate interactive study tools from educational YouTube videos. By taking a YouTube URL as input, the system extracts the transcript and uses an LLM to generate an interactive multiple-choice quiz and flashcard deck, complete with contextual deep-links back to the source video.
 
 ## 2. Problem Statement
-Students and self-learners spend an inordinate amount of time manually creating flashcards from video lectures. There is a need for a seamless, instantaneous tool that bridges the gap between passive video consumption and active recall studying, without requiring complex software installations or manual transcription.
+Students spend too much time manually creating notes. Furthermore, standard flashcard apps are passive and disconnected from the source material; when a student forgets a concept, they don't know where in the 40-minute lecture it was discussed.
 
 ## 3. Scope & Audience
 - **Primary Users:** High school/college students and self-directed learners.
-- **Language Scope:** English (Primary). System must support both manual and auto-generated YouTube captions. Multilingual support via strict transliteration.
+- **Language Scope:** English (Primary). System must support both manual and auto-generated YouTube captions.
 - **Platform Scope:** Web Browser (Mobile-responsive).
 
 ## 4. Functional Requirements
-1. The system must accept a valid YouTube URL and validate its format using strict regex (supporting `youtu.be` and `youtube.com/watch` formats).
-2. The system must extract the English transcript. It must prioritize manual captions, falling back to auto-generated. If neither exists, OR if the transcript contains fewer than 100 words (e.g., a music video), it must explicitly crash with a logged 400 error.
-3. The system must process the transcript to generate dynamic flashcards: 3 cards for videos under 5 mins, and 5 cards per 10 minutes for longer videos.
-4. The system must render these pairs as interactive, flippable digital cards in the browser, with specific error UI states for invalid videos.
-5. **[New] Export to Anki:** The system must provide a 1-click button to download the flashcard deck as a `.txt` file formatted specifically for Anki import (tab-separated values).
-6. **Accessibility:** The UI must adhere to WCAG 2.1 AA standards (keyboard navigability).
-7. **[Security] Rate Limiting:** The API must limit users to 5 generations per IP per hour to prevent API credit abuse during the hackathon.
+1. The system must accept a valid YouTube URL and validate its format using strict regex.
+2. The system must extract the English transcript. It prioritizes manual captions, falling back to auto-generated. Crash with 400 error if < 100 words.
+3. The system must generate a dynamic "Interactive Quiz Deck" (3 cards for videos < 5 mins, 5 cards per 10 mins).
+4. **[V2] Quiz Mode:** Each card must include the Question, the Correct Answer, 3 Plausible Distractors, and a 1-sentence explanation of why the answer is correct.
+5. **[V2] Contextual Timestamps:** The back of every card must contain a link that opens the exact moment in the YouTube video where the concept is discussed (must open in a new tab or iframe to preserve app state).
+6. **Export to Anki:** Provide a 1-click button to download the deck as a `.txt` file for Anki import.
+7. **Accessibility:** UI adheres to WCAG 2.1 AA standards.
+8. **Rate Limiting:** Maximum 5 generations per IP per hour.
 
 ## 5. Data Governance & Privacy (Mandatory)
 - **Data Sources:** Public YouTube transcripts via `youtube-transcript-api`. LLM generation via Gemini APIs.
-- **PII Risk Level:** Low/Medium. All raw transcripts must pass through an explicit `presidio-analyzer` (or strict regex fallback) PII scrubbing pipeline removing emails/phone numbers *before* LLM ingestion.
+- **PII Scrubbing:** `presidio-analyzer` (or regex fallback) sanitization before LLM ingestion.
 - **Scale:** Maximum video length enforced at 20 minutes (approx. 3,000 words).
-- **Format Constraints:** Standard UTF-8 text. Mixed scripts must use strict transliteration libraries.
+- **Format Constraints:** Standard UTF-8 text.
 
 ## 6. Success Metrics & Benchmarks
-- **AI/LLM Benchmarks:** Flashcard generation end-to-end latency < 15.0 seconds. Token processing speed > 100 tokens/sec.
+- **AI/LLM Benchmarks:** End-to-end latency < 15.0 seconds. 
 - **Software Metrics:** Initial page load time < 1.5 seconds.
 - **A11y Metrics:** 100% Lighthouse Accessibility Score.
-- **Business/User Metrics:** Generates exactly a 5-card deck from a standard 10-minute video with 0 data extraction failures on captioned videos.
