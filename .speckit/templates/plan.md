@@ -42,7 +42,13 @@ The application consists of a Vanilla frontend and a serverless FastAPI backend.
 │   ├── scraper.py     
 │   ├── models.py      
 │   └── uv.lock        
-└── README.md
+├── README.md
+├── USER_MANUAL.md
+├── AGENTS.md
+├── CONTRIBUTING.md
+├── SECURITY.md
+├── state_checkpoint.json
+└── LICENSE
 ```
 
 ## 7. Evaluation Framework & Deployment

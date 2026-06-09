@@ -36,5 +36,12 @@
 
 ## Phase 6: Documentation & Handoff
 - `[ ]` Write `README.md` with explicit `.env` setup and `uv run` instructions.
+- `[ ]` Write `USER_MANUAL.md` explaining how to use QuickCards.
+- `[ ]` Write `AGENTS.md` to guide future AI agent handoffs.
+- `[ ]` Write compliance docs: `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `SECURITY.md`.
+- `[ ]` Add an open-source `LICENSE` file.
+- `[ ]` Create `state_checkpoint.json` for state persistence.
+- `[ ]` Initialize `CHANGELOG.md`.
+- `[ ]` Outline the Hackathon Pitch Deck (`QuickCards_Pitch.pptx`).
 - `[ ]` Configure UptimeRobot (or similar cron) to ping the Render backend every 14 minutes.
 - `[ ]` Generate `walkthrough.md`.
