@@ -301,12 +301,9 @@ def generate_scraper_blocked_deck(error_msg: str) -> dict:
     # If we exhaust all models and it's the demo video, use the hardcoded deck!
     if video_id == "Dq6dBoFor00":
         try:
-            import os
-            demo_path = os.path.join(os.path.dirname(__file__), "demo_deck.json")
-            with open(demo_path, "r", encoding="utf-8") as f:
-                data = json.load(f)
-                logger.info("Used hardcoded demo deck bypass.")
-                return Deck.model_validate(data)
+            from backend.demo_data import DEMO_DECK
+            logger.info("Used hardcoded demo deck bypass.")
+            return Deck.model_validate(DEMO_DECK)
         except Exception as e:
             logger.error(f"Failed to load demo deck: {e}")
 

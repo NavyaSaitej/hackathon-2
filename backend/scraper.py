@@ -57,11 +57,9 @@ def fetch_transcript(video_id: str) -> list[Segment]:
     # HARDCODED BYPASS FOR DEMO VIDEO to avoid Vercel 429 IP bans
     if video_id == "Dq6dBoFor00":
         try:
-            demo_path = os.path.join(os.path.dirname(__file__), "demo_segments.json")
-            with open(demo_path, "r", encoding="utf-8") as f:
-                data = json.load(f)
-                logger.info("Used hardcoded demo transcript bypass.")
-                return [Segment(**s) for s in data]
+            from backend.demo_data import DEMO_SEGMENTS
+            logger.info("Used hardcoded demo transcript bypass.")
+            return [Segment(**s) for s in DEMO_SEGMENTS]
         except Exception as e:
             logger.error(f"Failed to load demo segments: {e}")
 
