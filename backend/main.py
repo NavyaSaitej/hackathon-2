@@ -1,5 +1,5 @@
 """
-QuickCards — FastAPI Backend (V5 Ultimate)
+QuickCards â€” FastAPI Backend (V5 Ultimate)
 
 Core responsibilities:
 - CORS middleware (Vercel frontend only)
@@ -36,21 +36,20 @@ def safe_get_remote_address(request: Request) -> str:
 from models import Deck, QuizCard
 from scraper import process_video
 
-# ──────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 # Configuration
-# ──────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 load_dotenv()
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 APP_SECRET = os.getenv("APP_SECRET", "quickcards-dev-secret")
 
 if not GEMINI_API_KEY:
-    logger.critical("GEMINI_API_KEY not set. Backend cannot start.")
-    raise RuntimeError("GEMINI_API_KEY environment variable is required.")
+    logger.warning("GEMINI_API_KEY not set. AI generation will fail unless using the demo bypass.")
 
-# ──────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 # App Initialization
-# ──────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 limiter = Limiter(key_func=safe_get_remote_address)
 app = FastAPI(
     title="QuickCards API",
@@ -72,7 +71,7 @@ async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
     )
 
 
-# CORS — allow Vercel frontend
+# CORS â€” allow Vercel frontend
 ALLOWED_ORIGINS = [
     "http://localhost:8000",
     "http://localhost:5500",
@@ -93,10 +92,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ──────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 # Gemini Client
-# ──────────────────────────────────────────────
-client = genai.Client(api_key=GEMINI_API_KEY)
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+try:
+    client = genai.Client(api_key=GEMINI_API_KEY)
+except Exception as e:
+    logger.warning(f"Failed to initialize Gemini Client: {e}")
+    client = None
+    
 MODEL_ID = "gemini-2.0-flash"
 
 SYSTEM_PROMPT = """You are an expert educational content creator. Given a video transcript
@@ -108,7 +112,7 @@ RULES:
 3. Each distractor must be plausible but clearly wrong.
 4. The explanation must be exactly 1 sentence.
 5. timestamp_seconds MUST be copied from the nearest [TS:seconds] tag
-   in the transcript — do NOT invent timestamps.
+   in the transcript â€” do NOT invent timestamps.
 6. Before outputting, internally verify: are all 3 distractors actually
    wrong? Is the correct_answer actually supported by the transcript?
 
@@ -155,55 +159,58 @@ def call_gemini_with_retry(transcript: str, card_count: int, video_id: str) -> D
     models_to_try = ["gemini-2.0-flash", "gemini-1.5-flash"]
     last_error = "Unknown error"
 
-    for model_name in models_to_try:
-        max_retries = 2
-        for attempt in range(1, max_retries + 1):
-            try:
-                logger.info(f"Gemini attempt {attempt}/{max_retries} with {model_name}")
-                start = time.time()
+    if client:
+        for model_name in models_to_try:
+            max_retries = 2
+            for attempt in range(1, max_retries + 1):
+                try:
+                    logger.info(f"Gemini attempt {attempt}/{max_retries} with {model_name}")
+                    start = time.time()
 
-                response = client.models.generate_content(
-                    model=model_name,
-                contents=user_prompt,
-                config={
-                    "system_instruction": SYSTEM_PROMPT,
-                    "temperature": 0.0,
-                    "response_mime_type": "application/json",
-                },
-            )
+                    response = client.models.generate_content(
+                        model=model_name,
+                        contents=user_prompt,
+                        config={
+                            "system_instruction": SYSTEM_PROMPT,
+                            "temperature": 0.0,
+                            "response_mime_type": "application/json",
+                        },
+                    )
 
-            elapsed = time.time() - start
-            logger.info(f"Gemini responded in {elapsed:.2f}s")
+                    elapsed = time.time() - start
+                    logger.info(f"Gemini responded in {elapsed:.2f}s")
 
-            # Parse and validate against Pydantic schema
-            raw_text = response.text.strip()
-            
-            # Strip markdown fences if Gemini hallucinated them
-            if raw_text.startswith("```json"):
-                raw_text = raw_text[7:]
-            elif raw_text.startswith("```"):
-                raw_text = raw_text[3:]
-            if raw_text.endswith("```"):
-                raw_text = raw_text[:-3]
-            raw_text = raw_text.strip()
-            
-            parsed = json.loads(raw_text)
-            deck = Deck.model_validate(parsed)
+                    # Parse and validate against Pydantic schema
+                    raw_text = response.text.strip()
+                    
+                    # Strip markdown fences if Gemini hallucinated them
+                    if raw_text.startswith("```json"):
+                        raw_text = raw_text[7:]
+                    elif raw_text.startswith("```"):
+                        raw_text = raw_text[3:]
+                    if raw_text.endswith("```"):
+                        raw_text = raw_text[:-3]
+                    raw_text = raw_text.strip()
+                    
+                    parsed = json.loads(raw_text)
+                    deck = Deck.model_validate(parsed)
 
-            logger.info(f"Generated {len(deck.cards)} valid cards")
-            return deck
+                    logger.info(f"Generated {len(deck.cards)} valid cards")
+                    return deck
 
-        except json.JSONDecodeError as e:
-            last_error = f"JSON parse failed: {e}"
-            logger.warning(f"Attempt {attempt}: {last_error}")
-        except Exception as e:
-            last_error = f"Gemini API error: {e}"
-            logger.warning(f"Attempt {attempt}: {last_error}")
+                except json.JSONDecodeError as e:
+                    last_error = f"JSON parse failed: {e}"
+                    logger.warning(f"Attempt {attempt}: {last_error}")
+                except Exception as e:
+                    last_error = f"Gemini API error: {e}"
+                    logger.warning(f"Attempt {attempt}: {last_error}")
 
-        if attempt < max_retries:
-            backoff = 2**attempt
-            logger.info(f"Retrying {model_name} in {backoff}s...")
-            time.sleep(backoff)
+                if attempt < max_retries:
+                    backoff = 2**attempt
+                    logger.info(f"Retrying {model_name} in {backoff}s...")
+                    time.sleep(backoff)
+    else:
+        last_error = "Gemini client not initialized (missing API key)."
 
     # If we exhaust all models and it's the demo video, use the hardcoded deck!
     if video_id == "Dq6dBoFor00":
@@ -223,16 +230,16 @@ def call_gemini_with_retry(transcript: str, card_count: int, video_id: str) -> D
     )
 
 
-# ──────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 # Request Model
-# ──────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 class GenerateRequest(BaseModel):
     url: str
 
 
-# ──────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 # Routes
-# ──────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 @app.get("/health")
 async def health():
     """Health check endpoint for UptimeRobot cold-start pings."""
@@ -242,7 +249,7 @@ async def health():
 @app.post("/generate")
 @limiter.limit("5/hour")
 async def generate(request: Request, body: GenerateRequest):
-    """Main endpoint: YouTube URL → Quiz Deck JSON.
+    """Main endpoint: YouTube URL â†’ Quiz Deck JSON.
 
     Pipeline:
     1. Validate X-App-Secret header
