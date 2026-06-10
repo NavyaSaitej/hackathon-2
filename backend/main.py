@@ -147,6 +147,71 @@ def determine_card_count(transcript: str) -> int:
         return 8
 
 
+import re
+import random
+
+def generate_offline_fallback_deck(transcript: str) -> dict:
+    # Generate a primitive rule-based deck from the transcript when AI fails.
+    blocks = transcript.split('\n\n')
+    cards = []
+    
+    all_words = re.findall(r'\b[a-zA-Z]{5,}\b', transcript.lower())
+    if len(all_words) < 10:
+        all_words = ['Algorithm', 'Function', 'Variable', 'System', 'Data']
+        
+    for block in blocks:
+        if not block.strip():
+            continue
+            
+        ts_match = re.search(r'\[TS:(\d+)\]', block)
+        ts = int(ts_match.group(1)) if ts_match else 0
+        
+        text = re.sub(r'\[TS:\d+\]', '', block).strip()
+        sentences = [s.strip() for s in text.split('.') if len(s.strip()) > 20]
+        
+        for sentence in sentences:
+            words = re.findall(r'\b[a-zA-Z]+\b', sentence)
+            if not words: continue
+            
+            longest_word = max(words, key=len)
+            if len(longest_word) < 5:
+                continue
+                
+            question_text = sentence.replace(longest_word, '_____', 1) + '?'
+            
+            distractors = random.sample(all_words, min(3, len(all_words)))
+            distractors = [d.capitalize() for d in distractors if d.lower() != longest_word.lower()]
+            while len(distractors) < 3:
+                distractors.append(random.choice(['Concept', 'Method', 'Process', 'Theory']))
+                
+            cards.append({
+                'question': question_text.strip().capitalize(),
+                'correct_answer': longest_word,
+                'distractors': distractors[:3],
+                'explanation': 'Offline Fallback: AI quota exhausted. This card was auto-generated via rule-based extraction.',
+                'timestamp_seconds': ts
+            })
+            
+            if len(cards) >= 5:
+                break
+        if len(cards) >= 5:
+            break
+            
+    if not cards:
+        cards.append({
+            'question': 'Offline Mode Active: AI Quota Exhausted',
+            'correct_answer': 'Acknowledge',
+            'distractors': ['Retry', 'Error', 'Fail'],
+            'explanation': 'The AI service is unavailable and the transcript was too short for rule-based generation.',
+            'timestamp_seconds': 0
+        })
+        
+    return {
+        'video_title': 'Offline Fallback Deck',
+        'cards': cards
+    }
+
+
 def call_gemini_with_retry(transcript: str, card_count: int, video_id: str) -> Deck:
     """Call Gemini API with fallback models and hardcoded demo bypass.
 
@@ -224,10 +289,9 @@ def call_gemini_with_retry(transcript: str, card_count: int, video_id: str) -> D
         except Exception as e:
             logger.error(f"Failed to load demo deck: {e}")
 
-    raise HTTPException(
-        status_code=503,
-        detail=f"AI service temporarily unavailable. Error: {last_error}",
-    )
+    logger.warning("AI generation failed or quota exhausted. Using offline rule-based fallback.")
+    offline_data = generate_offline_fallback_deck(transcript)
+    return Deck.model_validate(offline_data)
 
 
 # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
