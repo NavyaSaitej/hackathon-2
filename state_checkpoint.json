@@ -1,0 +1,21 @@
+{
+  "project": "QuickCards",
+  "version": "1.0.0",
+  "checkpoint": "Phase 6 — Documentation Complete",
+  "features": {
+    "quiz_mode": true,
+    "timestamp_links": true,
+    "anki_export": true,
+    "pwa": true,
+    "glassmorphism_ui": true,
+    "rate_limiting": true,
+    "app_secret_auth": true,
+    "circuit_breaker": true,
+    "aria_accessibility": true
+  },
+  "deployment": {
+    "frontend": "Vercel (pending)",
+    "backend": "Render (pending)"
+  },
+  "last_updated": "2026-06-10"
+}
