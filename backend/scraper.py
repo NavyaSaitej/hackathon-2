@@ -57,7 +57,10 @@ def fetch_transcript(video_id: str) -> list[Segment]:
     # HARDCODED BYPASS FOR DEMO VIDEO to avoid Vercel 429 IP bans
     if video_id == "Dq6dBoFor00":
         try:
-            from backend.demo_data import DEMO_SEGMENTS
+            try:
+                from backend.demo_data import DEMO_SEGMENTS
+            except ImportError:
+                from demo_data import DEMO_SEGMENTS
             logger.info("Used hardcoded demo transcript bypass.")
             return [Segment(**s) for s in DEMO_SEGMENTS]
         except Exception as e:

@@ -301,7 +301,10 @@ def generate_scraper_blocked_deck(error_msg: str) -> dict:
     # If we exhaust all models and it's the demo video, use the hardcoded deck!
     if video_id == "Dq6dBoFor00":
         try:
-            from backend.demo_data import DEMO_DECK
+            try:
+                from backend.demo_data import DEMO_DECK
+            except ImportError:
+                from demo_data import DEMO_DECK
             logger.info("Used hardcoded demo deck bypass.")
             return Deck.model_validate(DEMO_DECK)
         except Exception as e:
