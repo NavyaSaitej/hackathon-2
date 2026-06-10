@@ -12,7 +12,7 @@ import { initQuiz, nextCard, prevCard, getSummaryData, exportAnki } from './ui.j
 import { loadVideo, clearVideo } from './video.js';
 
 // ── YouTube URL Regex ─────────────────────────
-const YT_REGEX = /^(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]{11})(?:&.*)?$/;
+const YT_REGEX = /^(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]{11})(?:[?&].*)?$/;
 
 // Demo URL for 1-click judge testing
 const DEMO_URL = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';

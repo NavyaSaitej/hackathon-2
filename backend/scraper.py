@@ -20,8 +20,8 @@ YT_REGEX = re.compile(
     r"^(?:https?://)?(?:www\.)?(?:youtube\.com/watch\?v=|youtu\.be/)([\w-]{11})(?:[?&].*)?$"
 )
 
-# Maximum video duration in seconds (20 minutes)
-MAX_DURATION_SECONDS = 20 * 60
+# Maximum video duration in seconds (2 hours)
+MAX_DURATION_SECONDS = 2 * 60 * 60
 
 
 def extract_video_id(url: str) -> str | None:
@@ -43,7 +43,8 @@ def fetch_transcript(video_id: str) -> list[dict]:
     logger.info(f"Fetching transcript for video: {video_id}")
 
     try:
-        transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
+        ytt_api = YouTubeTranscriptApi()
+        transcript_list = ytt_api.list(video_id)
         # Try to prefer English first
         try:
             transcript = transcript_list.find_transcript(["en", "en-US", "en-GB", "en-IN"])
