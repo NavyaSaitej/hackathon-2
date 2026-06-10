@@ -1,6 +1,6 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.9.0/schema.json",
-  "organizeImports": { "enabled": true },
+  "$schema": "https://biomejs.dev/schemas/2.4.16/schema.json",
+  "assist": { "actions": { "source": { "organizeImports": "on" } } },
   "linter": {
     "enabled": true,
     "rules": { "recommended": true }
@@ -12,7 +12,6 @@
     "lineWidth": 100
   },
   "files": {
-    "include": ["frontend/**/*.js"],
-    "ignore": ["node_modules", "frontend/sw.js"]
+    "includes": ["**/frontend/**/*.js", "!**/node_modules", "!**/frontend/sw.js"]
   }
 }

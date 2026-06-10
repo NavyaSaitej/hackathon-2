@@ -6,11 +6,12 @@
  */
 
 // Backend URL — update for production
-const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-  ? 'http://localhost:8080'
-  : ''; // Use relative path on Vercel
+const API_BASE =
+  window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
+    ? "http://localhost:8080"
+    : ""; // Use relative path on Vercel
 
-const APP_SECRET = 'quickcards-dev-secret'; // Must match backend .env
+const APP_SECRET = "quickcards-dev-secret"; // Must match backend .env
 
 /**
  * Send a YouTube URL to the backend and receive a quiz deck.
@@ -20,10 +21,10 @@ const APP_SECRET = 'quickcards-dev-secret'; // Must match backend .env
  */
 export async function generateDeck(url) {
   const response = await fetch(`${API_BASE}/generate`, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
-      'X-App-Secret': APP_SECRET,
+      "Content-Type": "application/json",
+      "X-App-Secret": APP_SECRET,
     },
     body: JSON.stringify({ url }),
   });

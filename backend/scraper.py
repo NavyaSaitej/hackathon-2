@@ -51,9 +51,8 @@ def fetch_transcript(video_id: str) -> list[Segment]:
     Returns the raw list of transcript segments.
     Raises ValueError if the transcript is too short or unavailable.
     """
-    import os
     logger.info(f"Fetching transcript for video: {video_id}")
-    
+
     # HARDCODED BYPASS FOR DEMO VIDEO to avoid Vercel 429 IP bans
     if video_id == "Dq6dBoFor00":
         try:
@@ -69,101 +68,118 @@ def fetch_transcript(video_id: str) -> list[Segment]:
     url = f"https://www.youtube.com/watch?v={video_id}"
 
     ydl_opts = {
-        'skip_download': True,
-        'writesubtitles': True,
-        'writeautomaticsub': True,
-        'subtitleslangs': ['en', 'en-US', 'en-GB', 'en-IN', 'hi', '.*'],
-        'quiet': True,
-        'no_warnings': True,
-        'extractor_args': {
-            'youtube': {
-                'client': ['android', 'ios']
-            }
-        }
+        "skip_download": True,
+        "writesubtitles": True,
+        "writeautomaticsub": True,
+        "subtitleslangs": ["en", "en-US", "en-GB", "en-IN", "hi", ".*"],
+        "quiet": True,
+        "no_warnings": True,
+        "extractor_args": {"youtube": {"client": ["android", "ios"]}},
     }
 
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=False)
-            
-        subs = info.get('subtitles') or {}
-        auto_subs = info.get('automatic_captions') or {}
-        
+
+        subs = info.get("subtitles") or {}
+        auto_subs = info.get("automatic_captions") or {}
+
         # Combine available languages
         available_langs = list(subs.keys()) + list(auto_subs.keys())
         if not available_langs:
             raise ValueError("No subtitles available")
-            
+
         # Try to find English first, else pick first available
-        target_lang = next((lang for lang in ['en', 'en-US', 'en-GB', 'en-IN'] if lang in available_langs), None)
+        target_lang = next(
+            (
+                lang
+                for lang in ["en", "en-US", "en-GB", "en-IN"]
+                if lang in available_langs
+            ),
+            None,
+        )
         if not target_lang:
             target_lang = available_langs[0]
-            
+
         # Get the sub tracks
         tracks = subs.get(target_lang) or auto_subs.get(target_lang)
-        json3_url = next((t['url'] for t in tracks if t['ext'] == 'json3'), None)
-        
+        json3_url = next((t["url"] for t in tracks if t["ext"] == "json3"), None)
+
         if not json3_url:
             raise ValueError("No JSON3 subtitle format found")
-            
+
         resp = ydl.urlopen(json3_url)
-        data = json.loads(resp.read().decode('utf-8'))
-        
+        data = json.loads(resp.read().decode("utf-8"))
+
         transcript_segments = []
-        for event in data.get('events', []):
-            if 'segs' not in event:
+        for event in data.get("events", []):
+            if "segs" not in event:
                 continue
-            text = "".join(s.get('utf8', '') for s in event['segs']).strip()
-            if not text or text == '\n':
+            text = "".join(s.get("utf8", "") for s in event["segs"]).strip()
+            if not text or text == "\n":
                 continue
-            start = event.get('tStartMs', 0) / 1000.0
-            duration = event.get('dDurationMs', 0) / 1000.0
-            transcript_segments.append(Segment(text=text, start=start, duration=duration))
-            
+            start = event.get("tStartMs", 0) / 1000.0
+            duration = event.get("dDurationMs", 0) / 1000.0
+            transcript_segments.append(
+                Segment(text=text, start=start, duration=duration)
+            )
+
         if not transcript_segments:
             raise ValueError("Empty transcript")
-            
+
     except Exception as e:
         logger.warning(f"yt-dlp failed: {e}. Falling back to youtube-transcript.ai...")
         try:
-            req = urllib.request.Request(f'https://youtube-transcript.ai/transcript/{video_id}.txt')
-            req.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)')
+            req = urllib.request.Request(
+                f"https://youtube-transcript.ai/transcript/{video_id}.txt"
+            )
+            req.add_header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
             with urllib.request.urlopen(req) as response:
-                txt = response.read().decode('utf-8')
+                txt = response.read().decode("utf-8")
 
             transcript_segments = []
-            for line in txt.split('\n'):
+            for line in txt.split("\n"):
                 line = line.strip()
-                if line.startswith('['):
-                    match = re.match(r'^\[([\d:]+)\]\s*(?:\[\]\s*)?(.*)', line)
+                if line.startswith("["):
+                    match = re.match(r"^\[([\d:]+)\]\s*(?:\[\]\s*)?(.*)", line)
                     if match:
                         time_str = match.group(1)
                         text = match.group(2).strip()
-                        if not text: continue
-                        
-                        parts = time_str.split(':')
+                        if not text:
+                            continue
+
+                        parts = time_str.split(":")
                         try:
                             if len(parts) == 3:
-                                start = int(parts[0])*3600 + int(parts[1])*60 + float(parts[2])
+                                start = (
+                                    int(parts[0]) * 3600
+                                    + int(parts[1]) * 60
+                                    + float(parts[2])
+                                )
                             elif len(parts) == 2:
-                                start = int(parts[0])*60 + float(parts[1])
+                                start = int(parts[0]) * 60 + float(parts[1])
                             else:
                                 start = float(parts[0])
                         except ValueError:
                             continue
-                            
-                        transcript_segments.append(Segment(text=text, start=start, duration=5.0))
-            
+
+                        transcript_segments.append(
+                            Segment(text=text, start=start, duration=5.0)
+                        )
+
             if not transcript_segments:
                 raise ValueError("Empty transcript from fallback")
-                
-            # Estimate durations
-            for i in range(len(transcript_segments)-1):
-                transcript_segments[i].duration = max(5.0, transcript_segments[i+1].start - transcript_segments[i].start)
-                
-        except Exception as fallback_e:
-            raise ValueError(f"Could not retrieve a transcript for this video. yt-dlp error: {e}. Fallback error: {fallback_e}")
 
+            # Estimate durations
+            for i in range(len(transcript_segments) - 1):
+                transcript_segments[i].duration = max(
+                    5.0, transcript_segments[i + 1].start - transcript_segments[i].start
+                )
+
+        except Exception as fallback_e:
+            raise ValueError(
+                f"Could not retrieve a transcript for this video. yt-dlp error: {e}. Fallback error: {fallback_e}"
+            )
 
     # Validate minimum content length
     full_text = " ".join(seg.text for seg in transcript_segments)
@@ -183,7 +199,9 @@ def fetch_transcript(video_id: str) -> list[Segment]:
                 f"Video too long ({total_duration:.0f}s). Maximum {MAX_DURATION_SECONDS}s."
             )
 
-    logger.info(f"Transcript fetched: {word_count} words, {len(transcript_segments)} segments")
+    logger.info(
+        f"Transcript fetched: {word_count} words, {len(transcript_segments)} segments"
+    )
     return transcript_segments
 
 

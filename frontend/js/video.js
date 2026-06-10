@@ -8,24 +8,24 @@
 
 let currentVideoId = null;
 
-const iframe = document.getElementById('yt-iframe');
-const wrapper = document.getElementById('video-wrapper');
-const toggleBtn = document.getElementById('btn-toggle-video');
-const titleText = document.getElementById('video-title-text');
+const iframe = document.getElementById("yt-iframe");
+const wrapper = document.getElementById("video-wrapper");
+const toggleBtn = document.getElementById("btn-toggle-video");
+const titleText = document.getElementById("video-title-text");
 
 /**
  * Load a YouTube video into the iframe.
  * @param {string} videoId - The 11-character YouTube video ID
  * @param {string} [title] - Optional display title
  */
-export function loadVideo(videoId, title = 'Video') {
+export function loadVideo(videoId, title = "Video") {
   currentVideoId = videoId;
   iframe.src = `https://www.youtube-nocookie.com/embed/${videoId}?enablejsapi=1&rel=0`;
   titleText.textContent = title;
 
   // Ensure video is expanded
-  wrapper.classList.remove('collapsed');
-  toggleBtn.querySelector('i').className = 'fa-solid fa-chevron-up';
+  wrapper.classList.remove("collapsed");
+  toggleBtn.querySelector("i").className = "fa-solid fa-chevron-up";
 }
 
 /**
@@ -37,19 +37,19 @@ export function seekTo(seconds) {
   if (!iframe.src) return;
 
   // Expand video if collapsed
-  if (wrapper.classList.contains('collapsed')) {
-    wrapper.classList.remove('collapsed');
-    toggleBtn.querySelector('i').className = 'fa-solid fa-chevron-up';
+  if (wrapper.classList.contains("collapsed")) {
+    wrapper.classList.remove("collapsed");
+    toggleBtn.querySelector("i").className = "fa-solid fa-chevron-up";
   }
 
   // YouTube iframe API postMessage command
   iframe.contentWindow.postMessage(
     JSON.stringify({
-      event: 'command',
-      func: 'seekTo',
+      event: "command",
+      func: "seekTo",
       args: [seconds, true],
     }),
-    '*'
+    "*",
   );
 }
 
@@ -57,15 +57,15 @@ export function seekTo(seconds) {
  * Clear the video and reset the panel.
  */
 export function clearVideo() {
-  iframe.src = '';
+  iframe.src = "";
   currentVideoId = null;
-  titleText.textContent = 'Video';
+  titleText.textContent = "Video";
 }
 
 // Toggle collapse/expand
-toggleBtn.addEventListener('click', () => {
-  const isCollapsed = wrapper.classList.toggle('collapsed');
-  toggleBtn.querySelector('i').className = isCollapsed
-    ? 'fa-solid fa-chevron-down'
-    : 'fa-solid fa-chevron-up';
+toggleBtn.addEventListener("click", () => {
+  const isCollapsed = wrapper.classList.toggle("collapsed");
+  toggleBtn.querySelector("i").className = isCollapsed
+    ? "fa-solid fa-chevron-down"
+    : "fa-solid fa-chevron-up";
 });

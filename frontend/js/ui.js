@@ -5,32 +5,32 @@
  * ARIA state management, and Anki export live here.
  */
 
-import { seekTo } from './video.js';
+import { seekTo } from "./video.js";
 
 // ── State ─────────────────────────────────────
-let deck = null;       // The full deck object from the API
-let currentIndex = 0;  // Current card index
-let score = 0;         // Correct answers count
-let answered = [];     // Track which cards have been answered
+let deck = null; // The full deck object from the API
+let currentIndex = 0; // Current card index
+let score = 0; // Correct answers count
+let answered = []; // Track which cards have been answered
 
 // ── DOM References ────────────────────────────
-const cardCounter = document.getElementById('card-counter');
-const scoreDisplay = document.getElementById('score-display');
-const question = document.getElementById('card-question');
-const answer = document.getElementById('card-answer');
-const explanation = document.getElementById('card-explanation');
-const flashcard = document.getElementById('flashcard');
-const cardFront = document.getElementById('card-front');
-const cardBack = document.getElementById('card-back');
-const choicesContainer = document.getElementById('choices-container');
-const btnTimestamp = document.getElementById('btn-timestamp');
-const timestampLabel = document.getElementById('timestamp-label');
-const btnPrev = document.getElementById('btn-prev');
-const btnNext = document.getElementById('btn-next');
-const progressFill = document.getElementById('progress-fill');
-const finalScore = document.getElementById('final-score');
-const totalCards = document.getElementById('total-cards');
-const summaryMessage = document.getElementById('summary-message');
+const cardCounter = document.getElementById("card-counter");
+const scoreDisplay = document.getElementById("score-display");
+const question = document.getElementById("card-question");
+const answer = document.getElementById("card-answer");
+const explanation = document.getElementById("card-explanation");
+const flashcard = document.getElementById("flashcard");
+const cardFront = document.getElementById("card-front");
+const cardBack = document.getElementById("card-back");
+const choicesContainer = document.getElementById("choices-container");
+const btnTimestamp = document.getElementById("btn-timestamp");
+const timestampLabel = document.getElementById("timestamp-label");
+const btnPrev = document.getElementById("btn-prev");
+const btnNext = document.getElementById("btn-next");
+const progressFill = document.getElementById("progress-fill");
+const finalScore = document.getElementById("final-score");
+const totalCards = document.getElementById("total-cards");
+const summaryMessage = document.getElementById("summary-message");
 
 /**
  * Initialize the quiz UI with a deck from the API.
@@ -63,25 +63,26 @@ function renderCard() {
   explanation.textContent = card.explanation;
 
   // Update progress bar
-  const pct = Math.max(5, ((currentIndex) / total) * 100);
+  const pct = Math.max(5, (currentIndex / total) * 100);
   progressFill.style.width = `${pct}%`;
 
   // Timestamp button
   const mins = Math.floor(card.timestamp_seconds / 60);
   const secs = card.timestamp_seconds % 60;
-  timestampLabel.textContent = `Jump to ${mins}:${String(secs).padStart(2, '0')}`;
+  timestampLabel.textContent = `Jump to ${mins}:${String(secs).padStart(2, "0")}`;
 
   // Un-flip card
-  flashcard.classList.remove('flipped');
-  cardFront.setAttribute('aria-hidden', 'false');
-  cardBack.setAttribute('aria-hidden', 'true');
+  flashcard.classList.remove("flipped");
+  cardFront.setAttribute("aria-hidden", "false");
+  cardBack.setAttribute("aria-hidden", "true");
 
   // Navigation
   btnPrev.disabled = currentIndex === 0;
-  btnNext.textContent = currentIndex === total - 1 ? 'Finish' : 'Next';
-  btnNext.innerHTML = currentIndex === total - 1
-    ? 'Finish <i class="fa-solid fa-flag-checkered"></i>'
-    : 'Next <i class="fa-solid fa-chevron-right"></i>';
+  btnNext.textContent = currentIndex === total - 1 ? "Finish" : "Next";
+  btnNext.innerHTML =
+    currentIndex === total - 1
+      ? 'Finish <i class="fa-solid fa-flag-checkered"></i>'
+      : 'Next <i class="fa-solid fa-chevron-right"></i>';
 
   // Build choices
   renderChoices(card);
@@ -92,28 +93,28 @@ function renderCard() {
  * Shuffles the order randomly.
  */
 function renderChoices(card) {
-  choicesContainer.innerHTML = '';
+  choicesContainer.innerHTML = "";
 
   const options = [card.correct_answer, ...card.distractors];
   shuffle(options);
 
-  const letters = ['A', 'B', 'C', 'D'];
+  const letters = ["A", "B", "C", "D"];
 
   options.forEach((option, i) => {
-    const btn = document.createElement('button');
-    btn.className = 'choice-btn';
+    const btn = document.createElement("button");
+    btn.className = "choice-btn";
     btn.innerHTML = `<span class="choice-letter">${letters[i]}</span><span>${option}</span>`;
 
     if (answered[currentIndex]) {
       // Already answered — show results
-      btn.classList.add('selected');
+      btn.classList.add("selected");
       if (option === card.correct_answer) {
-        btn.classList.add('correct');
+        btn.classList.add("correct");
         btn.innerHTML += `<i class="fa-solid fa-circle-check choice-feedback-icon" style="color: var(--correct)"></i>`;
       }
       btn.disabled = true;
     } else {
-      btn.addEventListener('click', () => handleChoice(option, card, btn));
+      btn.addEventListener("click", () => handleChoice(option, card, btn));
     }
 
     choicesContainer.appendChild(btn);
@@ -131,33 +132,33 @@ function handleChoice(selected, card, clickedBtn) {
 
   if (isCorrect) {
     score++;
-    clickedBtn.classList.add('correct');
+    clickedBtn.classList.add("correct");
     clickedBtn.innerHTML += `<i class="fa-solid fa-circle-check choice-feedback-icon" style="color: var(--correct)"></i>`;
   } else {
-    clickedBtn.classList.add('wrong');
+    clickedBtn.classList.add("wrong");
     clickedBtn.innerHTML += `<i class="fa-solid fa-circle-xmark choice-feedback-icon" style="color: var(--wrong)"></i>`;
 
     // Highlight the correct answer
-    const allBtns = choicesContainer.querySelectorAll('.choice-btn');
+    const allBtns = choicesContainer.querySelectorAll(".choice-btn");
     allBtns.forEach((btn) => {
-      if (btn.querySelector('span:last-child').textContent === card.correct_answer) {
-        btn.classList.add('correct');
+      if (btn.querySelector("span:last-child").textContent === card.correct_answer) {
+        btn.classList.add("correct");
         btn.innerHTML += `<i class="fa-solid fa-circle-check choice-feedback-icon" style="color: var(--correct)"></i>`;
       }
     });
   }
 
   // Disable all choices
-  choicesContainer.querySelectorAll('.choice-btn').forEach((btn) => {
+  choicesContainer.querySelectorAll(".choice-btn").forEach((btn) => {
     btn.disabled = true;
-    btn.style.cursor = 'default';
+    btn.style.cursor = "default";
   });
 
   // Flip card to show answer
   setTimeout(() => {
-    flashcard.classList.add('flipped');
-    cardFront.setAttribute('aria-hidden', 'true');
-    cardBack.setAttribute('aria-hidden', 'false');
+    flashcard.classList.add("flipped");
+    cardFront.setAttribute("aria-hidden", "true");
+    cardBack.setAttribute("aria-hidden", "false");
   }, 600);
 
   // Update score
@@ -171,10 +172,10 @@ function handleChoice(selected, card, clickedBtn) {
 export function getSummaryData() {
   const total = deck.cards.length;
   const pct = Math.round((score / total) * 100);
-  let message = 'Keep practicing!';
-  if (pct >= 90) message = 'Outstanding! You crushed it! 🎉';
-  else if (pct >= 70) message = 'Great job! Solid understanding! 💪';
-  else if (pct >= 50) message = 'Good effort! Review the tricky ones.';
+  let message = "Keep practicing!";
+  if (pct >= 90) message = "Outstanding! You crushed it! 🎉";
+  else if (pct >= 70) message = "Great job! Solid understanding! 💪";
+  else if (pct >= 50) message = "Good effort! Review the tricky ones.";
 
   return { score, total, message };
 }
@@ -186,16 +187,14 @@ export function getSummaryData() {
 export function exportAnki() {
   if (!deck) return;
 
-  const lines = deck.cards.map(
-    (c) => `${c.question}\t${c.correct_answer} — ${c.explanation}`
-  );
-  const content = lines.join('\n');
-  const blob = new Blob([content], { type: 'text/plain' });
+  const lines = deck.cards.map((c) => `${c.question}\t${c.correct_answer} — ${c.explanation}`);
+  const content = lines.join("\n");
+  const blob = new Blob([content], { type: "text/plain" });
   const url = URL.createObjectURL(blob);
 
-  const a = document.createElement('a');
+  const a = document.createElement("a");
   a.href = url;
-  a.download = 'quickcards_deck.txt';
+  a.download = "quickcards_deck.txt";
   a.click();
   URL.revokeObjectURL(url);
 }
@@ -238,7 +237,7 @@ export function prevCard() {
 }
 
 // ── Timestamp button ──────────────────────────
-btnTimestamp.addEventListener('click', () => {
+btnTimestamp.addEventListener("click", () => {
   if (deck) {
     seekTo(deck.cards[currentIndex].timestamp_seconds);
   }

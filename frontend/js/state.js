@@ -7,48 +7,49 @@
  * This is the entry-point module loaded by index.html.
  */
 
-import { generateDeck } from './api.js';
-import { initQuiz, nextCard, prevCard, getSummaryData, exportAnki } from './ui.js';
-import { loadVideo, clearVideo } from './video.js';
+import { generateDeck } from "./api.js";
+import { exportAnki, getSummaryData, initQuiz, nextCard, prevCard } from "./ui.js";
+import { clearVideo, loadVideo } from "./video.js";
 
 // ── YouTube URL Regex ─────────────────────────
-const YT_REGEX = /^(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]{11})(?:[?&].*)?$/;
+const YT_REGEX =
+  /^(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]{11})(?:[?&].*)?$/;
 
 // Demo URL for 1-click judge testing
-const DEMO_URL = 'https://www.youtube.com/watch?v=Dq6dBoFor00';
+const DEMO_URL = "https://www.youtube.com/watch?v=Dq6dBoFor00";
 
 // ── DOM References ────────────────────────────
 const states = {
-  landing: document.getElementById('state-landing'),
-  loading: document.getElementById('state-loading'),
-  quiz: document.getElementById('state-quiz'),
-  summary: document.getElementById('state-summary'),
+  landing: document.getElementById("state-landing"),
+  loading: document.getElementById("state-loading"),
+  quiz: document.getElementById("state-quiz"),
+  summary: document.getElementById("state-summary"),
 };
 
-const urlInput = document.getElementById('youtube-url');
-const btnGenerate = document.getElementById('btn-generate');
-const btnDemoUrl = document.getElementById('btn-demo-url');
-const loadingStatus = document.getElementById('loading-status');
-const loadingProgress = document.getElementById('loading-progress');
-const btnPrev = document.getElementById('btn-prev');
-const btnNext = document.getElementById('btn-next');
-const finalScore = document.getElementById('final-score');
-const totalCardsEl = document.getElementById('total-cards');
-const summaryMessage = document.getElementById('summary-message');
-const btnExport = document.getElementById('btn-export-anki');
-const btnRestart = document.getElementById('btn-restart');
+const urlInput = document.getElementById("youtube-url");
+const btnGenerate = document.getElementById("btn-generate");
+const btnDemoUrl = document.getElementById("btn-demo-url");
+const loadingStatus = document.getElementById("loading-status");
+const loadingProgress = document.getElementById("loading-progress");
+const btnPrev = document.getElementById("btn-prev");
+const btnNext = document.getElementById("btn-next");
+const finalScore = document.getElementById("final-score");
+const totalCardsEl = document.getElementById("total-cards");
+const summaryMessage = document.getElementById("summary-message");
+const btnExport = document.getElementById("btn-export-anki");
+const btnRestart = document.getElementById("btn-restart");
 
 // ── Theme Toggle ──────────────────────────────
-const themeToggle = document.getElementById('theme-toggle');
+const themeToggle = document.getElementById("theme-toggle");
 const rootHtml = document.documentElement;
-let isLightMode = localStorage.getItem('theme') === 'light';
+let isLightMode = localStorage.getItem("theme") === "light";
 
 function applyTheme() {
   if (isLightMode) {
-    rootHtml.setAttribute('data-theme', 'light');
+    rootHtml.setAttribute("data-theme", "light");
     themeToggle.innerHTML = '<i class="fa-solid fa-sun"></i>';
   } else {
-    rootHtml.removeAttribute('data-theme');
+    rootHtml.removeAttribute("data-theme");
     themeToggle.innerHTML = '<i class="fa-solid fa-moon"></i>';
   }
 }
@@ -56,16 +57,16 @@ function applyTheme() {
 // Initial apply
 applyTheme();
 
-themeToggle.addEventListener('click', () => {
+themeToggle.addEventListener("click", () => {
   isLightMode = !isLightMode;
-  localStorage.setItem('theme', isLightMode ? 'light' : 'dark');
+  localStorage.setItem("theme", isLightMode ? "light" : "dark");
   applyTheme();
 });
 
 // ── State Transitions ─────────────────────────
 function showState(name) {
-  Object.values(states).forEach((s) => s.classList.remove('active'));
-  states[name].classList.add('active');
+  Object.values(states).forEach((s) => s.classList.remove("active"));
+  states[name].classList.add("active");
 }
 
 // ── URL Validation ────────────────────────────
@@ -75,10 +76,10 @@ function validateUrl() {
   return isValid;
 }
 
-urlInput.addEventListener('input', validateUrl);
+urlInput.addEventListener("input", validateUrl);
 
 // ── Demo URL Button ───────────────────────────
-btnDemoUrl.addEventListener('click', () => {
+btnDemoUrl.addEventListener("click", () => {
   urlInput.value = DEMO_URL;
   validateUrl();
   urlInput.focus();
@@ -87,9 +88,9 @@ btnDemoUrl.addEventListener('click', () => {
 // ── Progressive Loading Animation ─────────────
 function animateLoading() {
   const stages = [
-    { text: 'Fetching transcript...', progress: 25 },
-    { text: 'Analyzing content...', progress: 55 },
-    { text: 'Generating quiz cards...', progress: 85 },
+    { text: "Fetching transcript...", progress: 25 },
+    { text: "Analyzing content...", progress: 55 },
+    { text: "Generating quiz cards...", progress: 85 },
   ];
 
   stages.forEach((stage, i) => {
@@ -101,20 +102,20 @@ function animateLoading() {
 }
 
 // ── Generate Flow ─────────────────────────────
-btnGenerate.addEventListener('click', async () => {
+btnGenerate.addEventListener("click", async () => {
   const url = urlInput.value.trim();
   if (!YT_REGEX.test(url)) return;
 
   // Transition to loading
-  showState('loading');
+  showState("loading");
   animateLoading();
 
   try {
     const deckData = await generateDeck(url);
 
     // Complete progress bar
-    loadingProgress.style.width = '100%';
-    loadingStatus.textContent = 'Done!';
+    loadingProgress.style.width = "100%";
+    loadingStatus.textContent = "Done!";
 
     // Short pause to let user see completion
     await new Promise((r) => setTimeout(r, 500));
@@ -126,18 +127,18 @@ btnGenerate.addEventListener('click', async () => {
     initQuiz(deckData);
 
     // Transition to quiz
-    showState('quiz');
+    showState("quiz");
   } catch (err) {
     // Return to landing with error
-    showState('landing');
+    showState("landing");
     alert(`Error: ${err.message}`);
   }
 });
 
 // ── Quiz Navigation ───────────────────────────
-btnPrev.addEventListener('click', prevCard);
+btnPrev.addEventListener("click", prevCard);
 
-btnNext.addEventListener('click', () => {
+btnNext.addEventListener("click", () => {
   const moved = nextCard();
   if (!moved) {
     // Quiz complete — show summary
@@ -145,28 +146,28 @@ btnNext.addEventListener('click', () => {
     finalScore.textContent = data.score;
     totalCardsEl.textContent = data.total;
     summaryMessage.textContent = data.message;
-    showState('summary');
+    showState("summary");
   }
 });
 
 // ── Summary Actions ───────────────────────────
-btnExport.addEventListener('click', exportAnki);
+btnExport.addEventListener("click", exportAnki);
 
-btnRestart.addEventListener('click', () => {
-  urlInput.value = '';
+btnRestart.addEventListener("click", () => {
+  urlInput.value = "";
   btnGenerate.disabled = true;
   clearVideo();
 
   // Reset loading state
-  loadingProgress.style.width = '0%';
-  loadingStatus.textContent = 'Fetching transcript...';
+  loadingProgress.style.width = "0%";
+  loadingStatus.textContent = "Fetching transcript...";
 
-  showState('landing');
+  showState("landing");
 });
 
 // ── PWA Service Worker Registration ───────────
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js').catch(() => {
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("sw.js").catch(() => {
     // SW registration failure is non-critical
   });
 }

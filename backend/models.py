@@ -14,9 +14,7 @@ class QuizCard(BaseModel):
     question: str = Field(
         ..., description="A clear, concise question derived from the video transcript."
     )
-    correct_answer: str = Field(
-        ..., description="The correct answer to the question."
-    )
+    correct_answer: str = Field(..., description="The correct answer to the question.")
     distractors: list[str] = Field(
         ...,
         min_length=3,
