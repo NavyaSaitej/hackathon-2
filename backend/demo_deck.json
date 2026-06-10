@@ -1,0 +1,38 @@
+{
+  "video_title": "The Ultimate Guide to TypeScript",
+  "cards": [
+    {
+      "question": "What is TypeScript primarily used for?",
+      "correct_answer": "Adding static typing to JavaScript",
+      "distractors": [
+        "Replacing HTML",
+        "Running databases",
+        "Styling web pages"
+      ],
+      "explanation": "TypeScript is a syntactic superset of JavaScript that adds static typing.",
+      "timestamp_seconds": 10
+    },
+    {
+      "question": "Which keyword is used to define a custom type?",
+      "correct_answer": "type",
+      "distractors": [
+        "def",
+        "class",
+        "struct"
+      ],
+      "explanation": "The type keyword allows you to define custom type aliases.",
+      "timestamp_seconds": 45
+    },
+    {
+      "question": "What does the any type do in TypeScript?",
+      "correct_answer": "It disables type checking for that variable",
+      "distractors": [
+        "It makes the variable immutable",
+        "It converts the variable to a string",
+        "It deletes the variable"
+      ],
+      "explanation": "The any type turns off type checking, essentially reverting to standard JavaScript behavior.",
+      "timestamp_seconds": 120
+    }
+  ]
+}
