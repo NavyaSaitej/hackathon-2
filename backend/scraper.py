@@ -17,7 +17,7 @@ from loguru import logger
 
 # Strict YouTube URL regex — accepts standard and shortened formats
 YT_REGEX = re.compile(
-    r"^(?:https?://)?(?:www\.)?(?:youtube\.com/watch\?v=|youtu\.be/)([\w-]{11})(?:&.*)?$"
+    r"^(?:https?://)?(?:www\.)?(?:youtube\.com/watch\?v=|youtu\.be/)([\w-]{11})(?:[?&].*)?$"
 )
 
 # Maximum video duration in seconds (20 minutes)
@@ -34,15 +34,26 @@ def extract_video_id(url: str) -> str | None:
 
 
 def fetch_transcript(video_id: str) -> list[dict]:
-    """Fetch the English transcript for a given video ID.
+    """Fetch the transcript for a given video ID.
 
-    Returns the raw list of transcript segments from youtube-transcript-api.
+    Prefers English, but falls back to any available language.
+    Returns the raw list of transcript segments.
     Raises ValueError if the transcript is too short or unavailable.
     """
     logger.info(f"Fetching transcript for video: {video_id}")
 
-    ytt_api = YouTubeTranscriptApi()
-    transcript_segments = ytt_api.fetch(video_id, languages=["en"])
+    try:
+        transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
+        # Try to prefer English first
+        try:
+            transcript = transcript_list.find_transcript(["en", "en-US", "en-GB", "en-IN"])
+        except Exception:
+            # Fallback to whatever is available
+            transcript = next(iter(transcript_list))
+            
+        transcript_segments = transcript.fetch()
+    except Exception as e:
+        raise ValueError(f"Could not retrieve a transcript for this video: {e}")
 
     # Validate minimum content length
     full_text = " ".join(seg.text for seg in transcript_segments)

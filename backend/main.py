@@ -24,7 +24,10 @@ from loguru import logger
 from pydantic import BaseModel
 from slowapi import Limiter
 from slowapi.errors import RateLimitExceeded
-from slowapi.util import get_remote_address
+
+def safe_get_remote_address(request: Request) -> str:
+    # Vercel serverless environment may not populate request.client
+    return request.headers.get("x-forwarded-for", "127.0.0.1").split(",")[0]
 
 from models import Deck, QuizCard
 from scraper import process_video
@@ -44,7 +47,7 @@ if not GEMINI_API_KEY:
 # ──────────────────────────────────────────────
 # App Initialization
 # ──────────────────────────────────────────────
-limiter = Limiter(key_func=get_remote_address)
+limiter = Limiter(key_func=safe_get_remote_address)
 app = FastAPI(
     title="QuickCards API",
     version="1.0.0",
@@ -220,7 +223,7 @@ async def generate(request: Request, body: GenerateRequest):
     # App-to-App handshake
     secret = request.headers.get("X-App-Secret", "")
     if secret != APP_SECRET:
-        logger.warning(f"Rejected request: invalid X-App-Secret from {get_remote_address(request)}")
+        logger.warning(f"Rejected request: invalid X-App-Secret from {safe_get_remote_address(request)}")
         raise HTTPException(status_code=403, detail="Forbidden: invalid app secret.")
 
     try:
