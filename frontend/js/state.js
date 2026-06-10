@@ -15,7 +15,7 @@ import { loadVideo, clearVideo } from './video.js';
 const YT_REGEX = /^(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]{11})(?:[?&].*)?$/;
 
 // Demo URL for 1-click judge testing
-const DEMO_URL = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
+const DEMO_URL = 'https://www.youtube.com/watch?v=Dq6dBoFor00';
 
 // ── DOM References ────────────────────────────
 const states = {
