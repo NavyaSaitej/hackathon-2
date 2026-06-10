@@ -6,8 +6,8 @@
  */
 
 // Backend URL — update for production
-const API_BASE = window.location.hostname === 'localhost'
-  ? 'http://localhost:8000'
+const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? 'http://localhost:8080'
   : 'https://quickcards-api.onrender.com'; // TODO: set actual Render URL
 
 const APP_SECRET = 'quickcards-dev-secret'; // Must match backend .env

@@ -38,6 +38,30 @@ const summaryMessage = document.getElementById('summary-message');
 const btnExport = document.getElementById('btn-export-anki');
 const btnRestart = document.getElementById('btn-restart');
 
+// ── Theme Toggle ──────────────────────────────
+const themeToggle = document.getElementById('theme-toggle');
+const rootHtml = document.documentElement;
+let isLightMode = localStorage.getItem('theme') === 'light';
+
+function applyTheme() {
+  if (isLightMode) {
+    rootHtml.setAttribute('data-theme', 'light');
+    themeToggle.innerHTML = '<i class="fa-solid fa-sun"></i>';
+  } else {
+    rootHtml.removeAttribute('data-theme');
+    themeToggle.innerHTML = '<i class="fa-solid fa-moon"></i>';
+  }
+}
+
+// Initial apply
+applyTheme();
+
+themeToggle.addEventListener('click', () => {
+  isLightMode = !isLightMode;
+  localStorage.setItem('theme', isLightMode ? 'light' : 'dark');
+  applyTheme();
+});
+
 // ── State Transitions ─────────────────────────
 function showState(name) {
   Object.values(states).forEach((s) => s.classList.remove('active'));

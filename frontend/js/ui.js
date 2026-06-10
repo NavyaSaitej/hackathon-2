@@ -27,6 +27,7 @@ const btnTimestamp = document.getElementById('btn-timestamp');
 const timestampLabel = document.getElementById('timestamp-label');
 const btnPrev = document.getElementById('btn-prev');
 const btnNext = document.getElementById('btn-next');
+const progressFill = document.getElementById('progress-fill');
 const finalScore = document.getElementById('final-score');
 const totalCards = document.getElementById('total-cards');
 const summaryMessage = document.getElementById('summary-message');
@@ -60,6 +61,10 @@ function renderCard() {
   // Answer (back)
   answer.textContent = card.correct_answer;
   explanation.textContent = card.explanation;
+
+  // Update progress bar
+  const pct = Math.max(5, ((currentIndex) / total) * 100);
+  progressFill.style.width = `${pct}%`;
 
   // Timestamp button
   const mins = Math.floor(card.timestamp_seconds / 60);

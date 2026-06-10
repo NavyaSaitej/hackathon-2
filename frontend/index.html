@@ -11,18 +11,26 @@
   <!-- PWA Manifest -->
   <link rel="manifest" href="manifest.json">
 
+  <!-- Inline SVG Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- FontAwesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
   <!-- Styles -->
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <!-- Theme Toggle -->
+  <button id="theme-toggle" class="theme-toggle" aria-label="Toggle light/dark theme">
+    <i class="fa-solid fa-moon"></i>
+  </button>
+
   <!-- ═══════════════════════════════════════════ -->
   <!-- STATE 1: LANDING                           -->
   <!-- ═══════════════════════════════════════════ -->
@@ -118,6 +126,11 @@
         <div class="card-progress">
           <span id="card-counter">Card 1 / 5</span>
           <span id="score-display" class="score-badge"><i class="fa-solid fa-star"></i> 0</span>
+        </div>
+
+        <!-- Progress Track -->
+        <div class="progress-track">
+          <div id="progress-fill" class="progress-fill" style="width: 0%"></div>
         </div>
 
         <!-- Flashcard with 3D flip -->

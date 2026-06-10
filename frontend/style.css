@@ -40,6 +40,36 @@
   --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* ── Light Mode Overrides ──────────────────────────── */
+[data-theme="light"] {
+  --bg-primary: #f4f2f7;
+  --bg-secondary: #e8e6ee;
+  --bg-card: rgba(0, 0, 0, 0.03);
+  --bg-glass: rgba(255, 255, 255, 0.7);
+  --bg-glass-hover: rgba(255, 255, 255, 0.85);
+
+  --text-primary: #1a1a2e;
+  --text-secondary: #555670;
+  --text-muted: #8888a0;
+
+  --accent: #6c3fd4;
+  --accent-glow: rgba(108, 63, 212, 0.2);
+  --accent-light: #7f5af0;
+
+  --border-glass: rgba(0, 0, 0, 0.08);
+  --border-accent: rgba(108, 63, 212, 0.25);
+
+  --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.08);
+  --shadow-glow: 0 0 30px rgba(108, 63, 212, 0.15);
+}
+
+[data-theme="light"] body::before {
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(108, 63, 212, 0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(44, 182, 125, 0.04) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 80%, rgba(229, 49, 112, 0.03) 0%, transparent 50%);
+}
+
 /* ── Reset & Base ──────────────────────────────────── */
 *, *::before, *::after {
   margin: 0;
@@ -375,10 +405,12 @@ body::before {
 .quiz-layout {
   width: 100%;
   max-width: 800px;
-  padding: 1.5rem;
+  padding: 1rem 1.5rem;
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 0.75rem;
+  overflow-y: auto;
+  max-height: 100vh;
 }
 
 /* Video Panel */
@@ -423,6 +455,7 @@ body::before {
 
 .video-wrapper {
   aspect-ratio: 16 / 9;
+  max-height: 240px;
   overflow: hidden;
   transition: max-height 0.4s ease, opacity 0.3s ease;
 }
@@ -459,17 +492,33 @@ body::before {
 
 .score-badge i { margin-right: 0.25rem; }
 
+/* Quiz Progress Track */
+.progress-track {
+  width: 100%;
+  height: 4px;
+  background: var(--bg-glass);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
+
 /* 3D Flashcard */
 .flashcard-container {
   perspective: 1000px;
   width: 100%;
-  min-height: 200px;
+  min-height: 180px;
 }
 
 .flashcard {
   position: relative;
   width: 100%;
-  min-height: 200px;
+  min-height: 180px;
   transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
   transform-style: preserve-3d;
   will-change: transform;
@@ -714,6 +763,39 @@ body::before {
   gap: 0.75rem;
 }
 
+/* ── Theme Toggle ──────────────────────────────────── */
+.theme-toggle {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 100;
+  background: var(--bg-glass);
+  border: 1px solid var(--border-glass);
+  border-radius: 50%;
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-primary);
+  font-size: 1.1rem;
+  transition: var(--transition);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.theme-toggle:hover {
+  border-color: var(--accent);
+  transform: scale(1.1);
+}
+
+/* ── Focus Outlines (A11y) ─────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
 /* ═══════════════════════════════════════════════════════
    RESPONSIVE
    ═══════════════════════════════════════════════════════ */
@@ -721,12 +803,18 @@ body::before {
   .hero-title { font-size: 2.5rem; }
   .features-grid { grid-template-columns: 1fr; }
   .choices-container { grid-template-columns: 1fr; }
-  .quiz-layout { padding: 1rem; }
+  .quiz-layout { padding: 0.75rem; }
 
   .video-wrapper {
-    aspect-ratio: 16 / 10;
+    max-height: 180px;
   }
 
   .flashcard-face { padding: 1.5rem; }
   .card-question-text { font-size: 1.05rem; }
+
+  .theme-toggle {
+    width: 36px;
+    height: 36px;
+    font-size: 0.95rem;
+  }
 }
