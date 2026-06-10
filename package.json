@@ -1,0 +1,14 @@
+{
+  "name": "quickcards",
+  "version": "1.0.0",
+  "description": "AI-powered YouTube-to-Flashcard quiz generator",
+  "private": true,
+  "scripts": {
+    "lint": "npx @biomejs/biome check frontend/js/",
+    "format": "npx prettier --write 'frontend/**/*.{js,css,html}'",
+    "serve": "python -m http.server 8000 -d frontend"
+  },
+  "keywords": ["flashcards", "quiz", "youtube", "education", "ai"],
+  "author": "Navya Sai Tej",
+  "license": "GPL-3.0"
+}
