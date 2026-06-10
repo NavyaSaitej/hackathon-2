@@ -13,7 +13,11 @@ Core responsibilities:
 import gc
 import json
 import os
+import sys
 import time
+
+# Ensure backend directory is in path so Vercel can find models.py and scraper.py
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Request
