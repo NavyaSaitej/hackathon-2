@@ -153,6 +153,7 @@ def call_gemini_with_retry(transcript: str, card_count: int) -> Deck:
 {transcript}"""
 
     max_retries = 3
+    last_error = "Unknown error"
     for attempt in range(1, max_retries + 1):
         try:
             logger.info(f"Gemini attempt {attempt}/{max_retries}")
@@ -173,6 +174,16 @@ def call_gemini_with_retry(transcript: str, card_count: int) -> Deck:
 
             # Parse and validate against Pydantic schema
             raw_text = response.text.strip()
+            
+            # Strip markdown fences if Gemini hallucinated them
+            if raw_text.startswith("```json"):
+                raw_text = raw_text[7:]
+            elif raw_text.startswith("```"):
+                raw_text = raw_text[3:]
+            if raw_text.endswith("```"):
+                raw_text = raw_text[:-3]
+            raw_text = raw_text.strip()
+            
             parsed = json.loads(raw_text)
             deck = Deck.model_validate(parsed)
 
@@ -180,9 +191,11 @@ def call_gemini_with_retry(transcript: str, card_count: int) -> Deck:
             return deck
 
         except json.JSONDecodeError as e:
-            logger.warning(f"Attempt {attempt}: JSON parse failed — {e}")
+            last_error = f"JSON parse failed: {e}"
+            logger.warning(f"Attempt {attempt}: {last_error}")
         except Exception as e:
-            logger.warning(f"Attempt {attempt}: Gemini error — {e}")
+            last_error = f"Gemini API error: {e}"
+            logger.warning(f"Attempt {attempt}: {last_error}")
 
         if attempt < max_retries:
             backoff = 2**attempt
@@ -191,7 +204,7 @@ def call_gemini_with_retry(transcript: str, card_count: int) -> Deck:
 
     raise HTTPException(
         status_code=503,
-        detail="AI service temporarily unavailable. Please try again in a moment.",
+        detail=f"AI service temporarily unavailable. Error: {last_error}",
     )
 
 
