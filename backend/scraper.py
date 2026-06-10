@@ -124,7 +124,46 @@ def fetch_transcript(video_id: str) -> list[Segment]:
             raise ValueError("Empty transcript")
             
     except Exception as e:
-        raise ValueError(f"Could not retrieve a transcript for this video: {e}")
+        logger.warning(f"yt-dlp failed: {e}. Falling back to youtube-transcript.ai...")
+        try:
+            req = urllib.request.Request(f'https://youtube-transcript.ai/transcript/{video_id}.txt')
+            req.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)')
+            with urllib.request.urlopen(req) as response:
+                txt = response.read().decode('utf-8')
+
+            transcript_segments = []
+            for line in txt.split('\n'):
+                line = line.strip()
+                if line.startswith('['):
+                    match = re.match(r'^\[([\d:]+)\]\s*(?:\[\]\s*)?(.*)', line)
+                    if match:
+                        time_str = match.group(1)
+                        text = match.group(2).strip()
+                        if not text: continue
+                        
+                        parts = time_str.split(':')
+                        try:
+                            if len(parts) == 3:
+                                start = int(parts[0])*3600 + int(parts[1])*60 + float(parts[2])
+                            elif len(parts) == 2:
+                                start = int(parts[0])*60 + float(parts[1])
+                            else:
+                                start = float(parts[0])
+                        except ValueError:
+                            continue
+                            
+                        transcript_segments.append(Segment(text=text, start=start, duration=5.0))
+            
+            if not transcript_segments:
+                raise ValueError("Empty transcript from fallback")
+                
+            # Estimate durations
+            for i in range(len(transcript_segments)-1):
+                transcript_segments[i].duration = max(5.0, transcript_segments[i+1].start - transcript_segments[i].start)
+                
+        except Exception as fallback_e:
+            raise ValueError(f"Could not retrieve a transcript for this video. yt-dlp error: {e}. Fallback error: {fallback_e}")
+
 
     # Validate minimum content length
     full_text = " ".join(seg.text for seg in transcript_segments)
