@@ -1,38 +1,60 @@
 {
-  "video_title": "The Ultimate Guide to TypeScript",
+  "video_title": "India's Crorepati Farmers",
   "cards": [
     {
-      "question": "What is TypeScript primarily used for?",
-      "correct_answer": "Adding static typing to JavaScript",
+      "question": "What is a significant factor contributing to the wealth of crorepati farmers in India?",
+      "correct_answer": "Commercial farming and cash crops",
       "distractors": [
-        "Replacing HTML",
-        "Running databases",
-        "Styling web pages"
+        "Government subsidies only",
+        "Working as IT professionals",
+        "Selling their land for real estate"
       ],
-      "explanation": "TypeScript is a syntactic superset of JavaScript that adds static typing.",
-      "timestamp_seconds": 10
+      "explanation": "Many wealthy farmers in India have transitioned from traditional subsistence farming to commercial farming of high-value cash crops.",
+      "timestamp_seconds": 60
     },
     {
-      "question": "Which keyword is used to define a custom type?",
-      "correct_answer": "type",
+      "question": "How does agricultural income taxation work in India?",
+      "correct_answer": "Agricultural income is largely exempt from income tax",
       "distractors": [
-        "def",
-        "class",
-        "struct"
+        "It is taxed at the highest bracket",
+        "Farmers pay a flat 30% tax",
+        "Only corporate farms are exempt"
       ],
-      "explanation": "The type keyword allows you to define custom type aliases.",
-      "timestamp_seconds": 45
-    },
-    {
-      "question": "What does the any type do in TypeScript?",
-      "correct_answer": "It disables type checking for that variable",
-      "distractors": [
-        "It makes the variable immutable",
-        "It converts the variable to a string",
-        "It deletes the variable"
-      ],
-      "explanation": "The any type turns off type checking, essentially reverting to standard JavaScript behavior.",
+      "explanation": "Under Section 10(1) of the Income Tax Act, 1961, agricultural income is completely exempt from income tax in India.",
       "timestamp_seconds": 120
+    },
+    {
+      "question": "What role does land ownership play in the wealth of these farmers?",
+      "correct_answer": "Large landholdings passed down through generations",
+      "distractors": [
+        "Most lease their land from the government",
+        "They buy small plots in urban areas",
+        "Land size has no correlation with farmer wealth"
+      ],
+      "explanation": "Generational wealth and large landholdings are a primary driver for the financial success of these farmers.",
+      "timestamp_seconds": 180
+    },
+    {
+      "question": "What technological shift is helping modern Indian farmers increase their yield?",
+      "correct_answer": "Precision agriculture and modern machinery",
+      "distractors": [
+        "Relying solely on monsoon rains",
+        "Using traditional hand tools",
+        "Banning the use of tractors"
+      ],
+      "explanation": "The adoption of modern farming equipment, drip irrigation, and precision agriculture has drastically improved yield and profitability.",
+      "timestamp_seconds": 240
+    },
+    {
+      "question": "Why is the exemption of agricultural tax sometimes controversial?",
+      "correct_answer": "Wealthy individuals may use it to evade taxes on non-farm income",
+      "distractors": [
+        "Because it harms small farmers",
+        "Because the government loses all its revenue",
+        "Because it violates international trade laws"
+      ],
+      "explanation": "The tax loophole allows some extremely wealthy individuals and politicians to route their non-agricultural income through farms to evade taxes.",
+      "timestamp_seconds": 300
     }
   ]
 }
