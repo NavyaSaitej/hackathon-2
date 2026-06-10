@@ -211,6 +211,27 @@ def generate_offline_fallback_deck(transcript: str) -> dict:
         'cards': cards
     }
 
+def generate_scraper_blocked_deck(error_msg: str) -> dict:
+    return {
+        'video_title': 'YouTube Anti-Bot Block Active',
+        'cards': [
+            {
+                'question': 'Why could the app not generate flashcards for this video?',
+                'correct_answer': 'YouTube blocked the server for bot activity',
+                'distractors': ['The video has no audio', 'The AI is offline', 'The video is private'],
+                'explanation': f'YouTube occasionally blocks cloud servers from downloading transcripts. Error: {str(error_msg)[:100]}...',
+                'timestamp_seconds': 0
+            },
+            {
+                'question': 'How can you fix this issue?',
+                'correct_answer': 'Try the Demo Video or wait for the IP ban to lift',
+                'distractors': ['Refresh the page 100 times', 'Buy a new computer', 'Uninstall your browser'],
+                'explanation': 'IP bans on serverless functions usually rotate or lift over time. The hardcoded Demo Video will always work.',
+                'timestamp_seconds': 0
+            }
+        ]
+    }
+
 
 def call_gemini_with_retry(transcript: str, card_count: int, video_id: str) -> Deck:
     """Call Gemini API with fallback models and hardcoded demo bypass.
@@ -276,27 +297,6 @@ def call_gemini_with_retry(transcript: str, card_count: int, video_id: str) -> D
                     time.sleep(backoff)
     else:
         last_error = "Gemini client not initialized (missing API key)."
-
-def generate_scraper_blocked_deck(error_msg: str) -> dict:
-    return {
-        'video_title': 'YouTube Anti-Bot Block Active',
-        'cards': [
-            {
-                'question': 'Why could the app not generate flashcards for this video?',
-                'correct_answer': 'YouTube blocked the server for bot activity',
-                'distractors': ['The video has no audio', 'The AI is offline', 'The video is private'],
-                'explanation': f'YouTube occasionally blocks cloud servers from downloading transcripts. Error: {str(error_msg)[:100]}...',
-                'timestamp_seconds': 0
-            },
-            {
-                'question': 'How can you fix this issue?',
-                'correct_answer': 'Try the Demo Video or wait for the IP ban to lift',
-                'distractors': ['Refresh the page 100 times', 'Buy a new computer', 'Uninstall your browser'],
-                'explanation': 'IP bans on serverless functions usually rotate or lift over time. The hardcoded Demo Video will always work.',
-                'timestamp_seconds': 0
-            }
-        ]
-    }
 
     # If we exhaust all models and it's the demo video, use the hardcoded deck!
     if video_id == "Dq6dBoFor00":
