@@ -21,10 +21,15 @@ const APP_SECRET = "quickcards-dev-secret"; // Must match backend .env
  * @throws {Error} with user-friendly message
  */
 export async function generateDeck(url, language = "English") {
-  const aiProvider = localStorage.getItem("ai_provider") || "gemini";
+  let aiProvider = localStorage.getItem("ai_provider") || "gemini";
   const apiKey = localStorage.getItem("gemini_api_key") || "";
   const localEndpoint = localStorage.getItem("local_endpoint") || "http://localhost:11434/api/chat";
   const localModel = localStorage.getItem("local_model") || "llama3";
+
+  // Force default Gemini provider for the hardcoded Demo Video to ensure it remains instant
+  if (url.includes("Dq6dBoFor00")) {
+    aiProvider = "gemini";
+  }
 
   if (aiProvider === "local") {
     // 1. Fetch transcript from backend

@@ -19,6 +19,10 @@
       "destination": "/backend/main.py"
     },
     {
+      "source": "/transcript",
+      "destination": "/backend/main.py"
+    },
+    {
       "source": "/(.*)",
       "destination": "/frontend/$1"
     }
