@@ -36,7 +36,10 @@
       <option value="Hindi">Hindi</option>
       <option value="Telugu">Telugu</option>
     </select>
-    <button id="theme-toggle" class="theme-toggle" aria-label="Toggle light/dark/oled theme">
+    <button id="sound-toggle" class="theme-toggle" aria-label="Toggle sound effects" title="Toggle Sound">
+      <i class="fa-solid fa-volume-high"></i>
+    </button>
+    <button id="theme-toggle" class="theme-toggle" aria-label="Toggle light/dark/oled theme" title="Toggle Theme">
       <i class="fa-solid fa-moon"></i>
     </button>
   </div>
@@ -198,6 +201,13 @@
         <span id="final-score">0</span> / <span id="total-cards">0</span>
       </div>
       <p id="summary-message" class="summary-message" data-i18n="greatEffort">Great effort!</p>
+      
+      <!-- Review Mistakes Panel -->
+      <div id="review-mistakes-container" class="review-mistakes-container" style="display: none;">
+        <h3 style="margin-bottom: 10px; color: var(--text-primary); border-bottom: 1px solid var(--border); padding-bottom: 5px;">Cards to Review</h3>
+        <ul id="review-mistakes-list" class="review-mistakes-list"></ul>
+      </div>
+
       <div class="summary-actions">
         <button id="btn-share-results" class="btn-primary" aria-label="Share Results" style="background: linear-gradient(135deg, #ff6b6b, #ff8e53);">
           <i class="fa-solid fa-share-nodes"></i> <span data-i18n="shareBtn">Share Results</span>

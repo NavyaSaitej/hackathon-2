@@ -12,6 +12,52 @@ let deck = null; // The full deck object from the API
 let currentIndex = 0; // Current card index
 let score = 0; // Correct answers count
 let answered = []; // Track which cards have been answered
+let missedCards = []; // Track incorrect answers for review
+
+// ── Audio Context (Web Audio API) ─────────────
+const AudioContext = window.AudioContext || window.webkitAudioContext;
+const audioCtx = new AudioContext();
+let soundEnabled = true;
+
+export function toggleSound() {
+  // Resume context if suspended (browser autoplay policy)
+  if (audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+  soundEnabled = !soundEnabled;
+  return soundEnabled;
+}
+
+function playSound(type) {
+  if (!soundEnabled) return;
+  if (audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+  
+  const oscillator = audioCtx.createOscillator();
+  const gainNode = audioCtx.createGain();
+  
+  oscillator.connect(gainNode);
+  gainNode.connect(audioCtx.destination);
+  
+  if (type === 'correct') {
+    oscillator.type = 'sine';
+    oscillator.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+    oscillator.frequency.exponentialRampToValueAtTime(1046.50, audioCtx.currentTime + 0.1); // C6
+    gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+    oscillator.start();
+    oscillator.stop(audioCtx.currentTime + 0.3);
+  } else {
+    oscillator.type = 'sawtooth';
+    oscillator.frequency.setValueAtTime(150, audioCtx.currentTime);
+    oscillator.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.2);
+    gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+    oscillator.start();
+    oscillator.stop(audioCtx.currentTime + 0.2);
+  }
+}
 
 // ── DOM References ────────────────────────────
 const cardCounter = document.getElementById("card-counter");
@@ -41,6 +87,7 @@ export function initQuiz(deckData) {
   currentIndex = 0;
   score = 0;
   answered = new Array(deck.cards.length).fill(false);
+  missedCards = [];
   renderCard();
 }
 
@@ -132,9 +179,16 @@ function handleChoice(selected, card, clickedBtn) {
 
   if (isCorrect) {
     score++;
+    playSound('correct');
     clickedBtn.classList.add("correct");
     clickedBtn.innerHTML += `<i class="fa-solid fa-circle-check choice-feedback-icon" style="color: var(--correct)"></i>`;
   } else {
+    playSound('wrong');
+    missedCards.push({
+      question: card.question,
+      wrongAnswer: selected,
+      correctAnswer: card.correct_answer
+    });
     clickedBtn.classList.add("wrong");
     clickedBtn.innerHTML += `<i class="fa-solid fa-circle-xmark choice-feedback-icon" style="color: var(--wrong)"></i>`;
 
@@ -178,6 +232,33 @@ export function getSummaryData() {
   else if (pct >= 50) message = "Good effort! Review the tricky ones.";
 
   return { score, total, message };
+}
+
+/**
+ * Render the missed cards panel on the summary screen
+ */
+export function renderReviewMistakes() {
+  const container = document.getElementById("review-mistakes-container");
+  const list = document.getElementById("review-mistakes-list");
+  if (!container || !list) return;
+
+  if (missedCards.length === 0) {
+    container.style.display = "none";
+  } else {
+    container.style.display = "block";
+    list.innerHTML = "";
+    missedCards.forEach(mc => {
+      const li = document.createElement("li");
+      li.innerHTML = `
+        <div class="review-q">${mc.question}</div>
+        <div>
+          <span class="review-w"><i class="fa-solid fa-xmark"></i> ${mc.wrongAnswer}</span>
+          <span class="review-a"><i class="fa-solid fa-check"></i> ${mc.correctAnswer}</span>
+        </div>
+      `;
+      list.appendChild(li);
+    });
+  }
 }
 
 /**

@@ -8,7 +8,7 @@
  */
 
 import { generateDeck } from "./api.js";
-import { exportAnki, getSummaryData, initQuiz, nextCard, prevCard } from "./ui.js";
+import { exportAnki, getSummaryData, initQuiz, nextCard, prevCard, toggleSound, renderReviewMistakes } from "./ui.js";
 import { clearVideo, loadVideo } from "./video.js";
 
 // ── YouTube URL Regex ─────────────────────────
@@ -39,6 +39,7 @@ const summaryMessage = document.getElementById("summary-message");
 const btnExport = document.getElementById("btn-export-anki");
 const btnRestart = document.getElementById("btn-restart");
 const btnShareResults = document.getElementById("btn-share-results");
+const soundToggle = document.getElementById("sound-toggle");
 
 // ── Theme Toggle ──────────────────────────────
 const themeToggle = document.getElementById("theme-toggle");
@@ -192,6 +193,15 @@ themeToggle.addEventListener("click", () => {
   applyTheme();
 });
 
+if (soundToggle) {
+  soundToggle.addEventListener("click", () => {
+    const isEnabled = toggleSound();
+    soundToggle.innerHTML = isEnabled 
+      ? '<i class="fa-solid fa-volume-high"></i>' 
+      : '<i class="fa-solid fa-volume-xmark"></i>';
+  });
+}
+
 // ── State Transitions ─────────────────────────
 function showState(name) {
   Object.values(states).forEach((s) => s.classList.remove("active"));
@@ -293,6 +303,7 @@ btnNext.addEventListener("click", () => {
     summaryMessage.textContent = data.message;
     
     updateStreak();
+    renderReviewMistakes();
 
     showState("summary");
 
