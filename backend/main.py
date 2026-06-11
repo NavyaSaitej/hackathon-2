@@ -328,11 +328,16 @@ Transcript:
     if video_id == "Dq6dBoFor00":
         try:
             try:
-                from backend.demo_data import DEMO_DECK
+                from backend.demo_data import DEMO_DECK, DEMO_DECK_HINDI, DEMO_DECK_TELUGU
             except ImportError:
-                from demo_data import DEMO_DECK
+                from demo_data import DEMO_DECK, DEMO_DECK_HINDI, DEMO_DECK_TELUGU
             logger.info("Used hardcoded demo deck bypass.")
-            return Deck.model_validate(DEMO_DECK)
+            if language == "Hindi":
+                return Deck.model_validate(DEMO_DECK_HINDI)
+            elif language == "Telugu":
+                return Deck.model_validate(DEMO_DECK_TELUGU)
+            else:
+                return Deck.model_validate(DEMO_DECK)
         except Exception as e:
             logger.error(f"Failed to load demo deck: {e}")
 
