@@ -107,7 +107,13 @@ ${transcript}`;
         })
       });
     } catch (e) {
-      throw new Error(`Failed to connect to Local AI at ${localEndpoint}. Ensure Ollama is running and OLLAMA_ORIGINS="*" is set.`);
+      throw new Error(
+        `Failed to connect to Local AI at ${localEndpoint}.\n\n` +
+        `If using localhost, modern browsers block public sites from accessing local ports (Private Network Access).\n` +
+        `Workarounds:\n` +
+        `1. Run 'ngrok http 11434' and paste the ngrok HTTPS URL here.\n` +
+        `2. Or, run this website locally on your machine.`
+      );
     }
 
     if (!ollamaRes.ok) {
