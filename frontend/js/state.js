@@ -256,6 +256,45 @@ if (btnSaveSettings) {
 // Load settings on init
 loadSettings();
 
+// ── Help Modal ───────────────────────────────
+const btnHelp = document.getElementById("btn-help");
+const helpModal = document.getElementById("help-modal");
+const btnCloseHelp = document.getElementById("btn-close-help");
+
+if (btnHelp) {
+  btnHelp.addEventListener("click", () => {
+    helpModal.style.display = "flex";
+  });
+}
+
+if (btnCloseHelp) {
+  btnCloseHelp.addEventListener("click", () => {
+    helpModal.style.display = "none";
+  });
+}
+
+// ── PWA Install Prompt ────────────────────────
+let deferredPrompt;
+const btnInstall = document.getElementById("btn-install");
+
+window.addEventListener("beforeinstallprompt", (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  if (btnInstall) {
+    btnInstall.style.display = "inline-flex";
+  }
+});
+
+if (btnInstall) {
+  btnInstall.addEventListener("click", async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    btnInstall.style.display = "none";
+  });
+}
+
 // ── State Transitions ─────────────────────────
 function showState(name) {
   Object.values(states).forEach((s) => s.classList.remove("active"));

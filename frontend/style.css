@@ -915,6 +915,18 @@ body::before {
   color: var(--text-primary);
 }
 
+.shortcut-key {
+  display: inline-block;
+  padding: 3px 8px;
+  font-size: 0.85rem;
+  font-family: monospace;
+  color: var(--text-primary);
+  background: rgba(0,0,0,0.2);
+  border: 1px solid var(--border-glass);
+  border-radius: 4px;
+  box-shadow: 0 2px 0 var(--border-glass);
+}
+
 /* ── Animations ──────────────────────────────── */
 .top-controls {
   position: fixed;
