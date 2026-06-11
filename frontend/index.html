@@ -28,6 +28,9 @@
 <body>
   <!-- Top Controls -->
   <div class="top-controls">
+    <div class="streak-counter" id="streak-counter" title="Daily Streak" style="color: #ff6b6b; font-weight: bold; display: flex; align-items: center; gap: 5px; margin-right: 15px; background: rgba(255, 107, 107, 0.1); padding: 5px 10px; border-radius: 20px;">
+      <i class="fa-solid fa-fire"></i> <span id="streak-count">0</span>
+    </div>
     <select id="language-select" class="language-select" aria-label="Select quiz language">
       <option value="English">English</option>
       <option value="Hindi">Hindi</option>
@@ -196,7 +199,10 @@
       </div>
       <p id="summary-message" class="summary-message" data-i18n="greatEffort">Great effort!</p>
       <div class="summary-actions">
-        <button id="btn-export-anki" class="btn-primary" aria-label="Export to Anki">
+        <button id="btn-share-results" class="btn-primary" aria-label="Share Results" style="background: linear-gradient(135deg, #ff6b6b, #ff8e53);">
+          <i class="fa-solid fa-share-nodes"></i> <span data-i18n="shareBtn">Share Results</span>
+        </button>
+        <button id="btn-export-anki" class="btn-secondary" aria-label="Export to Anki">
           <i class="fa-solid fa-file-export"></i> <span data-i18n="exportAnkiBtn">Export to Anki</span>
         </button>
         <button id="btn-restart" class="btn-secondary" aria-label="Start over">
@@ -206,6 +212,9 @@
     </div>
   </section>
 
+  <!-- Confetti Script -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  
   <!-- ES6 Modules -->
   <script type="module" src="js/state.js"></script>
 </body>

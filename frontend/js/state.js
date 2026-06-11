@@ -38,6 +38,7 @@ const totalCardsEl = document.getElementById("total-cards");
 const summaryMessage = document.getElementById("summary-message");
 const btnExport = document.getElementById("btn-export-anki");
 const btnRestart = document.getElementById("btn-restart");
+const btnShareResults = document.getElementById("btn-share-results");
 
 // ── Theme Toggle ──────────────────────────────
 const themeToggle = document.getElementById("theme-toggle");
@@ -151,6 +152,37 @@ function applyTheme() {
 // Initial apply
 applyTheme();
 
+// ── Daily Streak Logic ────────────────────────
+function initStreakDisplay() {
+  const streak = parseInt(localStorage.getItem("streak_count")) || 0;
+  const streakCountEl = document.getElementById("streak-count");
+  if (streakCountEl) streakCountEl.textContent = streak;
+}
+
+function updateStreak() {
+  const today = new Date().toDateString();
+  let streak = parseInt(localStorage.getItem("streak_count")) || 0;
+  const lastPlayed = localStorage.getItem("last_played_date");
+
+  if (lastPlayed !== today) {
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    
+    if (lastPlayed === yesterday.toDateString()) {
+      streak += 1;
+    } else {
+      streak = 1;
+    }
+    localStorage.setItem("streak_count", streak);
+    localStorage.setItem("last_played_date", today);
+  }
+  
+  const streakCountEl = document.getElementById("streak-count");
+  if (streakCountEl) streakCountEl.textContent = streak;
+}
+
+initStreakDisplay();
+
 themeToggle.addEventListener("click", () => {
   if (currentTheme === "dark") currentTheme = "light";
   else if (currentTheme === "light") currentTheme = "oled";
@@ -259,12 +291,59 @@ btnNext.addEventListener("click", () => {
     finalScore.textContent = data.score;
     totalCardsEl.textContent = data.total;
     summaryMessage.textContent = data.message;
+    
+    updateStreak();
+
     showState("summary");
+
+    // Trigger Confetti if perfect score
+    if (data.score === data.total && typeof confetti === "function") {
+      confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+    }
+  }
+});
+
+// ── Global Keyboard Shortcuts ────────────────
+document.addEventListener("keydown", (e) => {
+  if (!states.quiz.classList.contains("active")) return;
+  
+  if (e.key === "ArrowLeft") {
+    if (!btnPrev.disabled) btnPrev.click();
+  } else if (e.key === "ArrowRight") {
+    if (!btnNext.disabled) btnNext.click();
+  } else if (e.code === "Space") {
+    e.preventDefault(); // Prevent scrolling down
+    const flashcard = document.getElementById("flashcard");
+    if (flashcard) flashcard.classList.toggle("flipped");
+  } else if (["1", "2", "3", "4"].includes(e.key)) {
+    const choicesContainer = document.getElementById("choices-container");
+    const buttons = choicesContainer.querySelectorAll(".choice-btn");
+    const idx = parseInt(e.key) - 1;
+    if (buttons[idx] && !buttons[idx].disabled) {
+      buttons[idx].click();
+    }
   }
 });
 
 // ── Summary Actions ───────────────────────────
 btnExport.addEventListener("click", exportAnki);
+
+if (btnShareResults) {
+  btnShareResults.addEventListener("click", () => {
+    const data = getSummaryData();
+    const text = `I just scored ${data.score}/${data.total} on QuickCards AI Flashcards! 🧠⚡\n\nTry it out: ${window.location.href}`;
+    if (navigator.share) {
+      navigator.share({
+        title: "My QuickCards Score",
+        text: text,
+        url: window.location.href
+      }).catch(console.error);
+    } else {
+      navigator.clipboard.writeText(text);
+      alert("Score copied to clipboard!");
+    }
+  });
+}
 
 btnRestart.addEventListener("click", () => {
   urlInput.value = "";
