@@ -127,6 +127,9 @@ function updateLanguage(lang) {
 if (languageSelect) {
   languageSelect.addEventListener("change", (e) => {
     updateLanguage(e.target.value);
+    if (states.quiz.classList.contains("active") || states.summary.classList.contains("active")) {
+      btnGenerate.click();
+    }
   });
 }
 const rootHtml = document.documentElement;

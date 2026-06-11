@@ -156,102 +156,88 @@ def determine_card_count(transcript: str) -> int:
 
 
 
-def generate_offline_fallback_deck(transcript: str) -> dict:
-    # Generate a primitive rule-based deck from the transcript when AI fails.
-    blocks = transcript.split("\n\n")
-    cards = []
-
-    all_words = re.findall(r"\b[a-zA-Z]{5,}\b", transcript.lower())
-    if len(all_words) < 10:
-        all_words = ["Algorithm", "Function", "Variable", "System", "Data"]
-
-    for block in blocks:
-        if not block.strip():
-            continue
-
-        ts_match = re.search(r"\[TS:(\d+)\]", block)
-        ts = int(ts_match.group(1)) if ts_match else 0
-
-        text = re.sub(r"\[TS:\d+\]", "", block).strip()
-        sentences = [s.strip() for s in text.split(".") if len(s.strip()) > 20]
-
-        for sentence in sentences:
-            words = re.findall(r"\b[a-zA-Z]+\b", sentence)
-            if not words:
-                continue
-
-            longest_word = max(words, key=len)
-            if len(longest_word) < 5:
-                continue
-
-            question_text = sentence.replace(longest_word, "_____", 1) + "?"
-
-            distractors = random.sample(all_words, min(3, len(all_words)))
-            distractors = [
-                d.capitalize() for d in distractors if d.lower() != longest_word.lower()
-            ]
-            while len(distractors) < 3:
-                distractors.append(
-                    random.choice(["Concept", "Method", "Process", "Theory"])
-                )
-
-            cards.append(
+def generate_offline_fallback_deck(transcript: str, language: str = "English") -> dict:
+    if language == "Hindi":
+        return {
+            "video_title": "ऑफ़लाइन मोड (AI कोटा समाप्त)",
+            "cards": [
                 {
-                    "question": question_text.strip().capitalize(),
-                    "correct_answer": longest_word,
-                    "distractors": distractors[:3],
-                    "explanation": "Offline Fallback: AI quota exhausted. This card was auto-generated via rule-based extraction.",
-                    "timestamp_seconds": ts,
+                    "question": "कस्टम वीडियो के लिए फ्लैशकार्ड क्यों नहीं बन पाए?",
+                    "correct_answer": "AI जनरेशन कोटा समाप्त हो गया है।",
+                    "distractors": ["वीडियो में कोई आवाज़ नहीं है।", "इंटरनेट काम नहीं कर रहा है।", "वेबसाइट क्रैश हो गई है।"],
+                    "explanation": "यह एक ऑफ़लाइन फ़ॉलबैक कार्ड है क्योंकि हम वर्तमान में AI के साथ कनेक्ट नहीं कर पा रहे हैं। कृपया कुछ समय बाद पुनः प्रयास करें या डेमो वीडियो का उपयोग करें।",
+                    "timestamp_seconds": 0
                 }
-            )
+            ]
+        }
+    elif language == "Telugu":
+        return {
+            "video_title": "ఆఫ్‌లైన్ మోడ్ (AI కోటా ముగిసింది)",
+            "cards": [
+                {
+                    "question": "ఈ కస్టమ్ వీడియో కోసం ఫ్లాష్‌కార్డ్‌లు ఎందుకు సృష్టించబడలేదు?",
+                    "correct_answer": "AI జనరేషన్ కోటా ముగిసింది.",
+                    "distractors": ["వీడియోలో వాయిస్ లేదు.", "ఇంటర్నెట్ పనిచేయడం లేదు.", "వెబ్‌సైట్ క్రాష్ అయింది."],
+                    "explanation": "మేము ప్రస్తుతం AIకి కనెక్ట్ చేయలేకపోతున్నందున ఇది ఆఫ్‌లైన్ ఫాల్‌బ్యాక్ కార్డ్. దయచేసి కాసేపు ఆగి మళ్లీ ప్రయత్నించండి లేదా డెమో వీడియోని ఉపయోగించండి.",
+                    "timestamp_seconds": 0
+                }
+            ]
+        }
+    else:
+        return {
+            "video_title": "Offline Mode (AI Quota Exhausted)",
+            "cards": [
+                {
+                    "question": "Why couldn't flashcards be generated for this custom video?",
+                    "correct_answer": "The AI generation quota has been exhausted or API failed.",
+                    "distractors": ["The video has no audio.", "The internet is down.", "The website crashed."],
+                    "explanation": "This is an offline fallback card because we cannot connect to the AI currently. Please try again later or use the Demo Video.",
+                    "timestamp_seconds": 0
+                }
+            ]
+        }
 
-            if len(cards) >= 5:
-                break
-        if len(cards) >= 5:
-            break
 
-    if not cards:
-        cards.append(
-            {
-                "question": "Offline Mode Active: AI Quota Exhausted",
-                "correct_answer": "Acknowledge",
-                "distractors": ["Retry", "Error", "Fail"],
-                "explanation": "The AI service is unavailable and the transcript was too short for rule-based generation.",
-                "timestamp_seconds": 0,
-            }
-        )
-
-    return {"video_title": "Offline Fallback Deck", "cards": cards}
-
-
-def generate_scraper_blocked_deck(error_msg: str) -> dict:
-    return {
-        "video_title": "YouTube Anti-Bot Block Active",
-        "cards": [
-            {
-                "question": "Why could the app not generate flashcards for this video?",
-                "correct_answer": "YouTube blocked the server for bot activity",
-                "distractors": [
-                    "The video has no audio",
-                    "The AI is offline",
-                    "The video is private",
-                ],
-                "explanation": f"YouTube occasionally blocks cloud servers from downloading transcripts. Error: {str(error_msg)[:100]}...",
-                "timestamp_seconds": 0,
-            },
-            {
-                "question": "How can you fix this issue?",
-                "correct_answer": "Try the Demo Video or wait for the IP ban to lift",
-                "distractors": [
-                    "Refresh the page 100 times",
-                    "Buy a new computer",
-                    "Uninstall your browser",
-                ],
-                "explanation": "IP bans on serverless functions usually rotate or lift over time. The hardcoded Demo Video will always work.",
-                "timestamp_seconds": 0,
-            },
-        ],
-    }
+def generate_scraper_blocked_deck(error_msg: str, language: str = "English") -> dict:
+    if language == "Hindi":
+        return {
+            "video_title": "YouTube एंटी-बॉट ब्लॉक सक्रिय",
+            "cards": [
+                {
+                    "question": "ऐप इस वीडियो के लिए फ्लैशकार्ड क्यों नहीं बना सका?",
+                    "correct_answer": "YouTube ने सर्वर को ब्लॉक कर दिया है।",
+                    "distractors": ["वीडियो में आवाज़ नहीं है", "AI ऑफ़लाइन है", "वीडियो निजी है"],
+                    "explanation": f"YouTube कभी-कभी सर्वरों को ट्रांसक्रिप्ट डाउनलोड करने से रोकता है। Error: {str(error_msg)[:50]}...",
+                    "timestamp_seconds": 0,
+                }
+            ],
+        }
+    elif language == "Telugu":
+        return {
+            "video_title": "YouTube యాంటీ-బాట్ బ్లాక్ యాక్టివ్",
+            "cards": [
+                {
+                    "question": "యాప్ ఈ వీడియో కోసం ఫ్లాష్‌కార్డ్‌లను ఎందుకు సృష్టించలేకపోయింది?",
+                    "correct_answer": "YouTube సర్వర్‌ను బ్లాక్ చేసింది.",
+                    "distractors": ["వీడియోలో వాయిస్ లేదు", "AI ఆఫ్‌లైన్‌లో ఉంది", "వీడియో ప్రైవేట్"],
+                    "explanation": f"YouTube కొన్నిసార్లు సర్వర్‌లను ట్రాన్స్‌క్రిప్ట్‌లను డౌన్‌లోడ్ చేయకుండా నిరోధిస్తుంది. Error: {str(error_msg)[:50]}...",
+                    "timestamp_seconds": 0,
+                }
+            ],
+        }
+    else:
+        return {
+            "video_title": "YouTube Anti-Bot Block Active",
+            "cards": [
+                {
+                    "question": "Why could the app not generate flashcards for this video?",
+                    "correct_answer": "YouTube blocked the server for bot activity",
+                    "distractors": ["The video has no audio", "The AI is offline", "The video is private"],
+                    "explanation": f"YouTube occasionally blocks cloud servers from downloading transcripts. Error: {str(error_msg)[:50]}...",
+                    "timestamp_seconds": 0,
+                }
+            ],
+        }
 
 
 def call_gemini_with_retry(transcript: str, card_count: int, video_id: str, language: str = "English") -> Deck:
@@ -344,7 +330,7 @@ Transcript:
     logger.warning(
         "AI generation failed or quota exhausted. Using offline rule-based fallback."
     )
-    offline_data = generate_offline_fallback_deck(transcript)
+    offline_data = generate_offline_fallback_deck(transcript, language)
     return Deck.model_validate(offline_data)
 
 
@@ -409,7 +395,7 @@ async def generate(request: Request, body: GenerateRequest):
     except Exception as e:
         logger.error(f"Scraper error: {e}")
         # Completely indestructible: If scraper fails, return anti-bot fallback deck
-        fallback_data = generate_scraper_blocked_deck(str(e))
+        fallback_data = generate_scraper_blocked_deck(str(e), body.language)
 
         # We need a generic video_id for the frontend to embed SOMETHING, or we can extract it manually
         import re
