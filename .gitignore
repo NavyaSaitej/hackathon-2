@@ -33,3 +33,5 @@ htmlcov/
 
 # Docker
 *.log
+
+.vercel

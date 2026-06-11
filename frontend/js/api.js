@@ -16,17 +16,18 @@ const APP_SECRET = "quickcards-dev-secret"; // Must match backend .env
 /**
  * Send a YouTube URL to the backend and receive a quiz deck.
  * @param {string} url - The YouTube video URL
+ * @param {string} language - The selected language for the quiz
  * @returns {Promise<Object>} The deck JSON
  * @throws {Error} with user-friendly message
  */
-export async function generateDeck(url) {
+export async function generateDeck(url, language = "English") {
   const response = await fetch(`${API_BASE}/generate`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       "X-App-Secret": APP_SECRET,
     },
-    body: JSON.stringify({ url }),
+    body: JSON.stringify({ url, language }),
   });
 
   if (!response.ok) {

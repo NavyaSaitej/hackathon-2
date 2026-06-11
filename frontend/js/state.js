@@ -41,13 +41,104 @@ const btnRestart = document.getElementById("btn-restart");
 
 // ── Theme Toggle ──────────────────────────────
 const themeToggle = document.getElementById("theme-toggle");
+const languageSelect = document.getElementById("language-select");
+
+// ── Localization (i18n) ───────────────────────
+const i18n = {
+  English: {
+    heroSubtitle: "Transform any YouTube video into interactive quiz flashcards — powered by AI.",
+    demoBtn: "Demo",
+    generateBtn: "Generate Cards",
+    feat1Title: "AI-Powered",
+    feat1Desc: "Gemini generates smart questions with plausible distractors.",
+    feat2Title: "Timestamp Links",
+    feat2Desc: "Every card links to the exact moment in the video.",
+    feat3Title: "Anki Export",
+    feat3Desc: "Download your deck as a ready-to-import Anki file.",
+    loading: "Fetching transcript...",
+    videoLabel: "Video",
+    questionLabel: "Question",
+    answerLabel: "Correct Answer",
+    prevBtn: "Prev",
+    nextBtn: "Next",
+    quizComplete: "Quiz Complete!",
+    greatEffort: "Great effort!",
+    exportAnkiBtn: "Export to Anki",
+    newVideoBtn: "New Video",
+    loadingText: "Fetching transcript..."
+  },
+  Hindi: {
+    heroSubtitle: "किसी भी YouTube वीडियो को इंटरैक्टिव क्विज़ फ्लैशकार्ड में बदलें — AI द्वारा संचालित।",
+    demoBtn: "डेमो",
+    generateBtn: "कार्ड जनरेट करें",
+    feat1Title: "AI-संचालित",
+    feat1Desc: "Gemini संभावित विकल्पों के साथ स्मार्ट प्रश्न उत्पन्न करता है।",
+    feat2Title: "टाइमस्टैम्प लिंक",
+    feat2Desc: "हर कार्ड वीडियो के सटीक क्षण से लिंक होता है।",
+    feat3Title: "Anki निर्यात",
+    feat3Desc: "अपने डेक को Anki फ़ाइल के रूप में डाउनलोड करें।",
+    loading: "ट्रांसक्रिप्ट प्राप्त कर रहा है...",
+    videoLabel: "वीडियो",
+    questionLabel: "प्रश्न",
+    answerLabel: "सही उत्तर",
+    prevBtn: "पिछला",
+    nextBtn: "अगला",
+    quizComplete: "क्विज़ पूरा हुआ!",
+    greatEffort: "बहुत बढ़िया प्रयास!",
+    exportAnkiBtn: "Anki में निर्यात करें",
+    newVideoBtn: "नया वीडियो",
+    loadingText: "ट्रांसक्रिप्ट प्राप्त कर रहा है..."
+  },
+  Telugu: {
+    heroSubtitle: "ఏదైనా YouTube వీడియోను ఇంటరాక్టివ్ క్విజ్ ఫ్లాష్‌కార్డ్‌లుగా మార్చండి — AI ద్వారా శక్తిని పొందుతుంది.",
+    demoBtn: "డెమో",
+    generateBtn: "కార్డులను రూపొందించండి",
+    feat1Title: "AI-ఆధారితం",
+    feat1Desc: "Gemini ఆమోదయోగ్యమైన ఎంపికలతో స్మార్ట్ ప్రశ్నలను సృష్టిస్తుంది.",
+    feat2Title: "టైమ్‌స్టాంప్ లింక్‌లు",
+    feat2Desc: "ప్రతి కార్డు వీడియోలోని ఖచ్చితమైన సమయానికి లింక్ చేస్తుంది.",
+    feat3Title: "Anki ఎగుమతి",
+    feat3Desc: "మీ డెక్‌ను Anki ఫైల్‌గా డౌన్‌లోడ్ చేసుకోండి.",
+    loading: "ట్రాన్స్క్రిప్ట్ పొందుతోంది...",
+    videoLabel: "వీడియో",
+    questionLabel: "ప్రశ్న",
+    answerLabel: "సరైన సమాధానం",
+    prevBtn: "మునుపటి",
+    nextBtn: "తదుపరి",
+    quizComplete: "క్విజ్ పూర్తయింది!",
+    greatEffort: "గొప్ప ప్రయత్నం!",
+    exportAnkiBtn: "Anki కి ఎగుమతి చేయండి",
+    newVideoBtn: "కొత్త వీడియో",
+    loadingText: "ట్రాన్స్క్రిప్ట్ పొందుతోంది..."
+  }
+};
+
+function updateLanguage(lang) {
+  const dict = i18n[lang];
+  if (!dict) return;
+  document.querySelectorAll("[data-i18n]").forEach(el => {
+    const key = el.getAttribute("data-i18n");
+    if (dict[key]) {
+      el.textContent = dict[key];
+    }
+  });
+}
+
+if (languageSelect) {
+  languageSelect.addEventListener("change", (e) => {
+    updateLanguage(e.target.value);
+  });
+}
 const rootHtml = document.documentElement;
-let isLightMode = localStorage.getItem("theme") === "light";
+let currentTheme = localStorage.getItem("theme") || "dark";
 
 function applyTheme() {
-  if (isLightMode) {
+  if (currentTheme === "light") {
     rootHtml.setAttribute("data-theme", "light");
     themeToggle.innerHTML = '<i class="fa-solid fa-sun"></i>';
+  } else if (currentTheme === "oled") {
+    rootHtml.setAttribute("data-theme", "oled");
+    themeToggle.innerHTML = '<i class="fa-solid fa-circle-half-stroke"></i>';
   } else {
     rootHtml.removeAttribute("data-theme");
     themeToggle.innerHTML = '<i class="fa-solid fa-moon"></i>';
@@ -58,8 +149,11 @@ function applyTheme() {
 applyTheme();
 
 themeToggle.addEventListener("click", () => {
-  isLightMode = !isLightMode;
-  localStorage.setItem("theme", isLightMode ? "light" : "dark");
+  if (currentTheme === "dark") currentTheme = "light";
+  else if (currentTheme === "light") currentTheme = "oled";
+  else currentTheme = "dark";
+  
+  localStorage.setItem("theme", currentTheme);
   applyTheme();
 });
 
@@ -86,12 +180,26 @@ btnDemoUrl.addEventListener("click", () => {
 });
 
 // ── Progressive Loading Animation ─────────────
-function animateLoading() {
-  const stages = [
-    { text: "Fetching transcript...", progress: 25 },
-    { text: "Analyzing content...", progress: 55 },
-    { text: "Generating quiz cards...", progress: 85 },
-  ];
+function animateLoading(lang) {
+  const allStages = {
+    English: [
+      { text: "Fetching transcript...", progress: 25 },
+      { text: "Analyzing content...", progress: 55 },
+      { text: "Generating quiz cards...", progress: 85 },
+    ],
+    Hindi: [
+      { text: "ट्रांसक्रिप्ट प्राप्त कर रहा है...", progress: 25 },
+      { text: "सामग्री का विश्लेषण कर रहा है...", progress: 55 },
+      { text: "क्विज़ कार्ड बना रहा है...", progress: 85 },
+    ],
+    Telugu: [
+      { text: "ట్రాన్స్క్రిప్ట్ పొందుతోంది...", progress: 25 },
+      { text: "కంటెంట్ విశ్లేషిస్తోంది...", progress: 55 },
+      { text: "క్విజ్ కార్డులు సృష్టిస్తోంది...", progress: 85 },
+    ]
+  };
+
+  const stages = allStages[lang] || allStages.English;
 
   stages.forEach((stage, i) => {
     setTimeout(() => {
@@ -106,16 +214,18 @@ btnGenerate.addEventListener("click", async () => {
   const url = urlInput.value.trim();
   if (!YT_REGEX.test(url)) return;
 
+  const language = languageSelect ? languageSelect.value : "English";
+
   // Transition to loading
   showState("loading");
-  animateLoading();
+  animateLoading(language);
 
   try {
-    const deckData = await generateDeck(url);
+    const deckData = await generateDeck(url, language);
 
     // Complete progress bar
     loadingProgress.style.width = "100%";
-    loadingStatus.textContent = "Done!";
+    loadingStatus.textContent = language === "Hindi" ? "पूरा हुआ!" : language === "Telugu" ? "పూర్తయింది!" : "Done!";
 
     // Short pause to let user see completion
     await new Promise((r) => setTimeout(r, 500));
@@ -160,7 +270,8 @@ btnRestart.addEventListener("click", () => {
 
   // Reset loading state
   loadingProgress.style.width = "0%";
-  loadingStatus.textContent = "Fetching transcript...";
+  const lang = languageSelect ? languageSelect.value : "English";
+  loadingStatus.textContent = i18n[lang]?.loadingText || "Fetching transcript...";
 
   showState("landing");
 });

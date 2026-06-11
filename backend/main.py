@@ -10,18 +10,19 @@ Core responsibilities:
 - Zero Retention: all transcript/LLM data garbage-collected after response
 """
 
+import sys
+import os
+
+# Ensure backend directory is in path so Vercel can find models.py and scraper.py
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
 from models import Deck
 from scraper import process_video
 import re
 import random
 import gc
 import json
-import os
-import sys
 import time
-
-# Ensure backend directory is in path so Vercel can find models.py and scraper.py
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Request
@@ -253,13 +254,16 @@ def generate_scraper_blocked_deck(error_msg: str) -> dict:
     }
 
 
-def call_gemini_with_retry(transcript: str, card_count: int, video_id: str) -> Deck:
+def call_gemini_with_retry(transcript: str, card_count: int, video_id: str, language: str = "English") -> Deck:
     """Call Gemini API with fallback models and hardcoded demo bypass.
 
     Returns a validated Deck object or raises HTTPException.
     """
-    user_prompt = f"""Generate exactly {card_count} quiz cards from this transcript:
+    user_prompt = f"""Generate exactly {card_count} quiz cards from this transcript.
+The quiz cards (question, correct_answer, distractors, explanation) MUST be written in the {language} language.
+The JSON keys MUST remain in English.
 
+Transcript:
 {transcript}"""
 
     models_to_try = ["gemini-2.0-flash", "gemini-1.5-flash"]
@@ -344,6 +348,7 @@ def call_gemini_with_retry(transcript: str, card_count: int, video_id: str) -> D
 # Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 class GenerateRequest(BaseModel):
     url: str
+    language: str = "English"
 
 
 # Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
@@ -383,7 +388,7 @@ async def generate(request: Request, body: GenerateRequest):
 
         # Phase 2: Determine card count & call LLM
         card_count = determine_card_count(annotated_transcript)
-        deck = call_gemini_with_retry(annotated_transcript, card_count, video_id)
+        deck = call_gemini_with_retry(annotated_transcript, card_count, video_id, body.language)
 
         # Phase 3: Build response
         response_data = deck.model_dump()
