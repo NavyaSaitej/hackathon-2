@@ -202,6 +202,60 @@ if (soundToggle) {
   });
 }
 
+// ── Settings Modal ────────────────────────────
+const btnSettings = document.getElementById("btn-settings");
+const settingsModal = document.getElementById("settings-modal");
+const btnCloseSettings = document.getElementById("btn-close-settings");
+const btnSaveSettings = document.getElementById("btn-save-settings");
+const aiProviderSelect = document.getElementById("ai-provider");
+const byokSettings = document.getElementById("byok-settings");
+const localSettings = document.getElementById("local-settings");
+const geminiApiKey = document.getElementById("gemini-api-key");
+const localEndpoint = document.getElementById("local-endpoint");
+const localModel = document.getElementById("local-model");
+
+function loadSettings() {
+  if (!aiProviderSelect) return;
+  aiProviderSelect.value = localStorage.getItem("ai_provider") || "gemini";
+  geminiApiKey.value = localStorage.getItem("gemini_api_key") || "";
+  localEndpoint.value = localStorage.getItem("local_endpoint") || "http://localhost:11434/api/chat";
+  localModel.value = localStorage.getItem("local_model") || "llama3";
+  updateSettingsUI();
+}
+
+function updateSettingsUI() {
+  byokSettings.style.display = aiProviderSelect.value === "byok" ? "block" : "none";
+  localSettings.style.display = aiProviderSelect.value === "local" ? "block" : "none";
+}
+
+if (aiProviderSelect) aiProviderSelect.addEventListener("change", updateSettingsUI);
+
+if (btnSettings) {
+  btnSettings.addEventListener("click", () => {
+    loadSettings();
+    settingsModal.style.display = "flex";
+  });
+}
+
+if (btnCloseSettings) {
+  btnCloseSettings.addEventListener("click", () => {
+    settingsModal.style.display = "none";
+  });
+}
+
+if (btnSaveSettings) {
+  btnSaveSettings.addEventListener("click", () => {
+    localStorage.setItem("ai_provider", aiProviderSelect.value);
+    localStorage.setItem("gemini_api_key", geminiApiKey.value.trim());
+    localStorage.setItem("local_endpoint", localEndpoint.value.trim());
+    localStorage.setItem("local_model", localModel.value.trim());
+    settingsModal.style.display = "none";
+  });
+}
+
+// Load settings on init
+loadSettings();
+
 // ── State Transitions ─────────────────────────
 function showState(name) {
   Object.values(states).forEach((s) => s.classList.remove("active"));

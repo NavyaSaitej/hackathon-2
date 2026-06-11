@@ -240,7 +240,7 @@ def generate_scraper_blocked_deck(error_msg: str, language: str = "English") -> 
         }
 
 
-def call_gemini_with_retry(transcript: str, card_count: int, video_id: str, language: str = "English") -> Deck:
+def call_gemini_with_retry(transcript: str, card_count: int, video_id: str, language: str = "English", custom_client=None) -> Deck:
     """Call Gemini API with fallback models and hardcoded demo bypass.
 
     Returns a validated Deck object or raises HTTPException.
@@ -255,7 +255,9 @@ Transcript:
     models_to_try = ["gemini-2.0-flash", "gemini-1.5-flash"]
     last_error = "Unknown error"
 
-    if client:
+    active_client = custom_client if custom_client else client
+
+    if active_client:
         for model_name in models_to_try:
             max_retries = 2
             for attempt in range(1, max_retries + 1):
@@ -265,7 +267,7 @@ Transcript:
                     )
                     start = time.time()
 
-                    response = client.models.generate_content(
+                    response = active_client.models.generate_content(
                         model=model_name,
                         contents=user_prompt,
                         config={
@@ -340,6 +342,10 @@ Transcript:
 class GenerateRequest(BaseModel):
     url: str
     language: str = "English"
+    api_key: str | None = None
+
+class TranscriptRequest(BaseModel):
+    url: str
 
 
 # Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
@@ -379,7 +385,15 @@ async def generate(request: Request, body: GenerateRequest):
 
         # Phase 2: Determine card count & call LLM
         card_count = determine_card_count(annotated_transcript)
-        deck = call_gemini_with_retry(annotated_transcript, card_count, video_id, body.language)
+        
+        custom_client = None
+        if body.api_key:
+            try:
+                custom_client = genai.Client(api_key=body.api_key)
+            except Exception as e:
+                logger.warning(f"Failed to init custom Gemini client: {e}")
+
+        deck = call_gemini_with_retry(annotated_transcript, card_count, video_id, body.language, custom_client)
 
         # Phase 3: Build response
         response_data = deck.model_dump()
@@ -409,3 +423,18 @@ async def generate(request: Request, body: GenerateRequest):
         response_data = Deck.model_validate(fallback_data).model_dump()
         response_data["video_id"] = extracted_id
         return response_data
+
+@app.post("/transcript")
+@limiter.limit("10/hour")
+async def get_transcript(request: Request, body: TranscriptRequest):
+    """Endpoint for returning raw transcript for Local AI processing."""
+    secret = request.headers.get("X-App-Secret", "")
+    if secret != APP_SECRET:
+        raise HTTPException(status_code=403, detail="Forbidden: invalid app secret.")
+
+    try:
+        video_id, annotated_transcript = process_video(body.url)
+        return {"video_id": video_id, "transcript": annotated_transcript}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
