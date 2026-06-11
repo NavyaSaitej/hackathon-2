@@ -9,9 +9,10 @@ QuickCards transforms YouTube educational videos into interactive quiz flashcard
 
 1. **Open QuickCards** in your browser.
 2. **Paste a YouTube URL** into the input field, or click the ⚡ **Demo** button to use a sample video.
-3. Click **Generate Cards** (the button activates once a valid URL is detected).
-4. Wait while the AI processes your video (typically 5-15 seconds).
-5. **Take the Quiz!** Select your answer from the 4 options displayed.
+3. **Select your Language** (English, Hindi, or Telugu) from the top right corner.
+4. Click **Generate Cards** (the button activates once a valid URL is detected).
+5. Wait while the AI processes your video (typically 5-15 seconds).
+6. **Take the Quiz!** Select your answer from the 4 options displayed.
 6. After answering, the card flips to reveal the correct answer and explanation.
 7. Click the **Jump to** button to watch the relevant part of the video.
 8. Navigate with **Prev/Next** buttons.
@@ -29,6 +30,10 @@ Every flashcard has a "Jump to X:XX" button on its back side. Clicking it seeks 
 
 #### Anki Export
 On the summary screen, click **Export to Anki** to download a `.txt` file. Import this file into Anki using the "Tab-separated" option.
+
+#### Themes and Localization
+- **Themes**: Click the theme toggle icon in the top right to cycle between Light, Dark, and a premium "Cyberpunk" OLED mode with glowing neon UI elements.
+- **Languages**: Use the language dropdown to switch between English, Hindi, and Telugu. Switching languages automatically translates the entire UI and re-fetches the current quiz in the new language!
 
 #### Progressive Web App (PWA)
 QuickCards can be installed on your phone or desktop. Look for the "Install" prompt in your browser's address bar.

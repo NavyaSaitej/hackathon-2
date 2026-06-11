@@ -13,8 +13,10 @@ Website Link:- https://hackathon-2-navyasaitejs-projects.vercel.app
 **Indestructible Transcript Scraping:** Features a multi-layered transcript scraping backend that utilizes `yt-dlp` and falls back dynamically to community-driven parsers, seamlessly bypassing bot-blocking for custom YouTube videos.
 
 **Interactive Flashcard UI:** 
-- Renders an immersive, glassmorphic dark-mode quiz interface.
+- Renders an immersive, glassmorphic dark-mode quiz interface, featuring a striking "Cyberpunk" OLED mode with neon grids and glowing UI elements.
 - 3D card flips, micro-animations, and dynamic progress bars enhance the learning experience.
+
+**True Localization:** Switch between English, Hindi, and Telugu. Not just static UI labels, the quizzes themselves are dynamically re-fetched and fully translated!
 
 **1-Click Anki Export:** Instantly download your completed quiz deck as a formatted `.txt` file, ready for seamless import into the popular spaced-repetition software, Anki.
 

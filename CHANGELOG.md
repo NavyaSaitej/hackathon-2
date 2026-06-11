@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.0] - 2026-06-11
+
+### Added
+- True Localization: Added dynamic support for Hindi and Telugu. Changing language auto-refetches the active quiz and translates the UI seamlessly.
+- Cyberpunk OLED Theme: Upgraded the pitch-black OLED theme with a sleek neon grid background and glowing glassmorphic borders for cards and inputs.
+- Localized Offline Fallback: When AI quota is exhausted, the offline fallback deck is now served in the currently selected language (English, Hindi, or Telugu) instead of forcing English questions.
+
+### Fixed
+- Fixed backend 500 error (`ModuleNotFoundError`) on Vercel Serverless environment by properly hoisting `sys.path.append`.
+- Replaced confusing rule-based English fallback questions with a single, clear explanatory card indicating the API quota limit.
+
 ## [1.0.0] - 2026-06-10
 
 ### Features
