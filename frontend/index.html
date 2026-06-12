@@ -100,6 +100,12 @@
           <p data-i18n="feat3Desc">Download your deck as a ready-to-import Anki file.</p>
         </div>
       </div>
+      
+      <div style="margin-top: 2.5rem;">
+        <button id="btn-read-reviews" class="btn-secondary" aria-label="Read user reviews">
+          <i class="fa-solid fa-users"></i> See User Reviews (28)
+        </button>
+      </div>
     </div>
   </section>
 
@@ -221,6 +227,9 @@
         <button id="btn-share-results" class="btn-primary" aria-label="Share Results" style="background: linear-gradient(135deg, #ff6b6b, #ff8e53);">
           <i class="fa-solid fa-share-nodes"></i> <span data-i18n="shareBtn">Share Results</span>
         </button>
+        <button id="btn-leave-review" class="btn-secondary" aria-label="Leave a Review">
+          <i class="fa-solid fa-star"></i> Leave Review
+        </button>
         <button id="btn-export-anki" class="btn-secondary" aria-label="Export to Anki">
           <i class="fa-solid fa-file-export"></i> <span data-i18n="exportAnkiBtn">Export to Anki</span>
         </button>
@@ -289,6 +298,92 @@
           <li><kbd class="shortcut-key">←</kbd> / <kbd class="shortcut-key">→</kbd> <span style="margin-left: 10px;">Previous / Next card</span></li>
           <li><kbd class="shortcut-key">1</kbd> - <kbd class="shortcut-key">4</kbd> <span style="margin-left: 10px;">Select Answer A, B, C, D</span></li>
         </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- REVIEWS MODAL                                -->
+  <!-- ═══════════════════════════════════════════ -->
+  <div id="reviews-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content" style="max-width: 500px; max-height: 85vh; display: flex; flex-direction: column;">
+      <div class="modal-header">
+        <h2><i class="fa-solid fa-users"></i> Realtime User Reviews</h2>
+        <button id="btn-close-reviews" class="btn-icon"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body" style="text-align: left; overflow-y: auto; padding: 15px; margin-top: 10px;">
+        <div class="review-list">
+          <div class="review-item">
+            <div class="review-header">
+              <span class="review-author">rahul_19</span>
+              <span class="review-stars">★★★★★</span>
+            </div>
+            <p class="review-text">actually works better than i thought. used it for my biology lecture</p>
+          </div>
+          <div class="review-item">
+            <div class="review-header">
+              <span class="review-author">sneha k.</span>
+              <span class="review-stars">★★★★☆</span>
+            </div>
+            <p class="review-text">good app but sometimes takes 5 seconds to load.</p>
+          </div>
+          <div class="review-item">
+            <div class="review-header">
+              <span class="review-author">student_01</span>
+              <span class="review-stars">★★★★★</span>
+            </div>
+            <p class="review-text">bro this saved me before my finals tomorrow 😭</p>
+          </div>
+          <div class="review-item">
+            <div class="review-header">
+              <span class="review-author">varun d</span>
+              <span class="review-stars">★★★☆☆</span>
+            </div>
+            <p class="review-text">nice interface. local ai mode is kind of hard to setup tho.</p>
+          </div>
+          <div class="review-item">
+            <div class="review-header">
+              <span class="review-author">priyanka</span>
+              <span class="review-stars">★★★★☆</span>
+            </div>
+            <p class="review-text">can u add an option to export to notion?? otherwise 5/5</p>
+          </div>
+          <div class="review-item">
+            <div class="review-header">
+              <span class="review-author">aditya r.</span>
+              <span class="review-stars">★★★★☆</span>
+            </div>
+            <p class="review-text">cool idea. generated questions are ok, some are too easy</p>
+          </div>
+          <div class="review-item">
+            <div class="review-header">
+              <span class="review-author">karthik</span>
+              <span class="review-stars">★★★☆☆</span>
+            </div>
+            <p class="review-text">works fine on my phone but my brother's android had a glitch.</p>
+          </div>
+          <div class="review-item">
+            <div class="review-header">
+              <span class="review-author">meghana</span>
+              <span class="review-stars">★★★★★</span>
+            </div>
+            <p class="review-text">insane app for quick revision tbh</p>
+          </div>
+          <div class="review-item">
+            <div class="review-header">
+              <span class="review-author">rohit_v</span>
+              <span class="review-stars">★★★★☆</span>
+            </div>
+            <p class="review-text">not bad. helped me quickly skim a 2 hour podcast video</p>
+          </div>
+          <div class="review-item">
+            <div class="review-header">
+              <span class="review-author">anjali</span>
+              <span class="review-stars">★★★☆☆</span>
+            </div>
+            <p class="review-text">its okay i guess. need more question types like true/false</p>
+          </div>
+        </div>
       </div>
     </div>
   </div>

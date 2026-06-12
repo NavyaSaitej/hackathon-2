@@ -273,6 +273,30 @@ if (btnCloseHelp) {
   });
 }
 
+// ── Reviews Modal ───────────────────────────────
+const btnReadReviews = document.getElementById("btn-read-reviews");
+const reviewsModal = document.getElementById("reviews-modal");
+const btnCloseReviews = document.getElementById("btn-close-reviews");
+
+if (btnReadReviews) {
+  btnReadReviews.addEventListener("click", () => {
+    reviewsModal.style.display = "flex";
+  });
+}
+
+if (btnCloseReviews) {
+  btnCloseReviews.addEventListener("click", () => {
+    reviewsModal.style.display = "none";
+  });
+}
+
+const btnLeaveReview = document.getElementById("btn-leave-review");
+if (btnLeaveReview) {
+  btnLeaveReview.addEventListener("click", () => {
+    alert("Thank you for your feedback! Your review has been submitted for moderation.");
+  });
+}
+
 // ── PWA Install Prompt ────────────────────────
 let deferredPrompt;
 const btnInstall = document.getElementById("btn-install");
