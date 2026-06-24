@@ -6,7 +6,7 @@
  * timestamp seeking via postMessage.
  */
 
-let currentVideoId = null;
+let _currentVideoId = null;
 
 const iframe = document.getElementById("yt-iframe");
 const wrapper = document.getElementById("video-wrapper");
@@ -19,7 +19,7 @@ const titleText = document.getElementById("video-title-text");
  * @param {string} [title] - Optional display title
  */
 export function loadVideo(videoId, title = "Video") {
-  currentVideoId = videoId;
+  _currentVideoId = videoId;
   iframe.src = `https://www.youtube-nocookie.com/embed/${videoId}?enablejsapi=1&rel=0`;
   titleText.textContent = title;
 
@@ -58,7 +58,7 @@ export function seekTo(seconds) {
  */
 export function clearVideo() {
   iframe.src = "";
-  currentVideoId = null;
+  _currentVideoId = null;
   titleText.textContent = "Video";
 }
 

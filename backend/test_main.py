@@ -1,5 +1,6 @@
 from models import QuizCard, Deck
 
+
 def test_deck_validation():
     deck = Deck(
         video_title="Test Video",
@@ -9,9 +10,9 @@ def test_deck_validation():
                 correct_answer="4",
                 distractors=["3", "5", "6"],
                 explanation="2+2 is 4",
-                timestamp_seconds=0
+                timestamp_seconds=0,
             )
-        ]
+        ],
     )
     assert deck.video_title == "Test Video"
     assert len(deck.cards) == 1

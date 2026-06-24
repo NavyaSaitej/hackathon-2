@@ -99,20 +99,20 @@ ${transcript}`;
           model: localModel,
           messages: [
             { role: "system", content: systemPrompt },
-            { role: "user", content: userPrompt }
+            { role: "user", content: userPrompt },
           ],
           stream: false,
           format: "json",
-          options: { temperature: 0.0 }
-        })
+          options: { temperature: 0.0 },
+        }),
       });
-    } catch (e) {
+    } catch (_e) {
       throw new Error(
         `Failed to connect to Local AI at ${localEndpoint}.\n\n` +
-        `If using localhost, modern browsers block public sites from accessing local ports (Private Network Access).\n` +
-        `Workarounds:\n` +
-        `1. Run 'ngrok http 11434' and paste the ngrok HTTPS URL here.\n` +
-        `2. Or, run this website locally on your machine.`
+          `If using localhost, modern browsers block public sites from accessing local ports (Private Network Access).\n` +
+          `Workarounds:\n` +
+          `1. Run 'ngrok http 11434' and paste the ngrok HTTPS URL here.\n` +
+          `2. Or, run this website locally on your machine.`,
       );
     }
 
@@ -125,7 +125,7 @@ ${transcript}`;
       const parsed = JSON.parse(ollamaData.message.content);
       parsed.video_id = video_id;
       return parsed;
-    } catch(e) {
+    } catch (_e) {
       throw new Error("Failed to parse JSON from Local AI.");
     }
   }

@@ -9,7 +9,7 @@
   --bg-secondary: #1a1a2e;
   --bg-card: rgba(255, 255, 255, 0.04);
   --bg-glass: rgba(255, 255, 255, 0.06);
-  --bg-glass-hover: rgba(255, 255, 255, 0.10);
+  --bg-glass-hover: rgba(255, 255, 255, 0.1);
 
   --text-primary: #fffffe;
   --text-secondary: #a7a9be;
@@ -41,7 +41,7 @@
 }
 
 /* ── Light Mode Overrides ──────────────────────────── */
-[data-theme="light"] {
+[data-theme='light'] {
   --bg-primary: #f4f2f7;
   --bg-secondary: #e8e6ee;
   --bg-card: rgba(0, 0, 0, 0.03);
@@ -63,7 +63,7 @@
   --shadow-glow: 0 0 30px rgba(108, 63, 212, 0.15);
 }
 
-[data-theme="light"] body::before {
+[data-theme='light'] body::before {
   background:
     radial-gradient(ellipse at 20% 50%, rgba(108, 63, 212, 0.06) 0%, transparent 50%),
     radial-gradient(ellipse at 80% 20%, rgba(44, 182, 125, 0.04) 0%, transparent 50%),
@@ -71,7 +71,7 @@
 }
 
 /* ── OLED Mode Overrides ───────────────────────────── */
-[data-theme="oled"] {
+[data-theme='oled'] {
   --bg-primary: #000000;
   --bg-secondary: #050505;
   --bg-card: rgba(255, 255, 255, 0.02);
@@ -93,52 +93,63 @@
   --shadow-glow: 0 0 25px rgba(154, 114, 255, 0.5);
 }
 
-[data-theme="oled"] body::before {
-  background: 
+[data-theme='oled'] body::before {
+  background:
     linear-gradient(rgba(154, 114, 255, 0.07) 1px, transparent 1px),
     linear-gradient(90deg, rgba(154, 114, 255, 0.07) 1px, transparent 1px),
     radial-gradient(ellipse at 50% 0%, rgba(154, 114, 255, 0.15) 0%, transparent 70%);
-  background-size: 30px 30px, 30px 30px, 100% 100%;
+  background-size:
+    30px 30px,
+    30px 30px,
+    100% 100%;
   opacity: 1;
 }
 
-[data-theme="oled"] .feature-card {
+[data-theme='oled'] .feature-card {
   border: 1px solid rgba(154, 114, 255, 0.3);
-  box-shadow: inset 0 0 15px rgba(154, 114, 255, 0.05), 0 0 20px rgba(154, 114, 255, 0.05);
+  box-shadow:
+    inset 0 0 15px rgba(154, 114, 255, 0.05),
+    0 0 20px rgba(154, 114, 255, 0.05);
 }
 
-[data-theme="oled"] .input-wrapper {
+[data-theme='oled'] .input-wrapper {
   border: 1px solid rgba(154, 114, 255, 0.4);
   box-shadow: 0 0 15px rgba(154, 114, 255, 0.15);
 }
 
-[data-theme="oled"] .feature-card:hover {
+[data-theme='oled'] .feature-card:hover {
   box-shadow: 0 0 15px var(--accent-glow);
 }
 
-[data-theme="oled"] .flashcard-face {
-  box-shadow: inset 0 0 10px rgba(154, 114, 255, 0.1), 0 0 20px rgba(154, 114, 255, 0.1);
+[data-theme='oled'] .flashcard-face {
+  box-shadow:
+    inset 0 0 10px rgba(154, 114, 255, 0.1),
+    0 0 20px rgba(154, 114, 255, 0.1);
 }
 
-[data-theme="oled"] .choice-btn {
+[data-theme='oled'] .choice-btn {
   box-shadow: inset 0 0 5px rgba(154, 114, 255, 0.1);
 }
 
-[data-theme="oled"] .choice-btn:hover:not(.selected) {
-  box-shadow: inset 0 0 10px rgba(154, 114, 255, 0.3), 0 0 15px var(--accent-glow);
+[data-theme='oled'] .choice-btn:hover:not(.selected) {
+  box-shadow:
+    inset 0 0 10px rgba(154, 114, 255, 0.3),
+    0 0 15px var(--accent-glow);
 }
 
-[data-theme="oled"] .video-panel {
+[data-theme='oled'] .video-panel {
   box-shadow: 0 0 20px rgba(154, 114, 255, 0.15);
 }
 
-[data-theme="oled"] .btn-nav {
+[data-theme='oled'] .btn-nav {
   box-shadow: 0 0 15px rgba(154, 114, 255, 0.2);
   border: 1px solid var(--border-accent);
 }
 
 /* ── Reset & Base ──────────────────────────────────── */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -184,8 +195,14 @@ body::before {
 }
 
 @keyframes fadeSlideIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -215,8 +232,15 @@ body::before {
 }
 
 @keyframes pulse {
-  0%, 100% { box-shadow: 0 0 30px var(--accent-glow); transform: scale(1); }
-  50% { box-shadow: 0 0 60px var(--accent-glow); transform: scale(1.05); }
+  0%,
+  100% {
+    box-shadow: 0 0 30px var(--accent-glow);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 60px var(--accent-glow);
+    transform: scale(1.05);
+  }
 }
 
 .hero-title {
@@ -428,7 +452,9 @@ body::before {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .spinner-icon {
@@ -524,7 +550,9 @@ body::before {
   aspect-ratio: 16 / 9;
   max-height: 240px;
   overflow: hidden;
-  transition: max-height 0.4s ease, opacity 0.3s ease;
+  transition:
+    max-height 0.4s ease,
+    opacity 0.3s ease;
 }
 
 .video-wrapper.collapsed {
@@ -557,7 +585,9 @@ body::before {
   color: var(--accent-secondary);
 }
 
-.score-badge i { margin-right: 0.25rem; }
+.score-badge i {
+  margin-right: 0.25rem;
+}
 
 /* Quiz Progress Track */
 .progress-track {
@@ -797,9 +827,15 @@ body::before {
 }
 
 @keyframes bounceIn {
-  0% { transform: scale(0); }
-  60% { transform: scale(1.2); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(0);
+  }
+  60% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 .summary-title {
@@ -898,7 +934,7 @@ body::before {
   width: 90%;
   max-width: 500px;
   padding: 24px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
   animation: floatUp 0.3s ease-out;
 }
 .modal-header {
@@ -921,7 +957,7 @@ body::before {
   font-size: 0.85rem;
   font-family: monospace;
   color: var(--text-primary);
-  background: rgba(0,0,0,0.2);
+  background: rgba(0, 0, 0, 0.2);
   border: 1px solid var(--border-glass);
   border-radius: 4px;
   box-shadow: 0 2px 0 var(--border-glass);
@@ -939,7 +975,7 @@ body::before {
   border: 1px solid var(--border-glass);
   border-radius: var(--radius-md);
   padding: 12px 15px;
-  box-shadow: inset 0 0 10px rgba(255,255,255,0.02);
+  box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.02);
 }
 
 .review-header {
@@ -1035,17 +1071,29 @@ body::before {
    RESPONSIVE
    ═══════════════════════════════════════════════════════ */
 @media (max-width: 640px) {
-  .hero-title { font-size: 2.5rem; }
-  .features-grid { grid-template-columns: 1fr; }
-  .choices-container { grid-template-columns: 1fr; }
-  .quiz-layout { padding: 0.75rem; }
+  .hero-title {
+    font-size: 2.5rem;
+  }
+  .features-grid {
+    grid-template-columns: 1fr;
+  }
+  .choices-container {
+    grid-template-columns: 1fr;
+  }
+  .quiz-layout {
+    padding: 0.75rem;
+  }
 
   .video-wrapper {
     max-height: 180px;
   }
 
-  .flashcard-face { padding: 1.5rem; }
-  .card-question-text { font-size: 1.05rem; }
+  .flashcard-face {
+    padding: 1.5rem;
+  }
+  .card-question-text {
+    font-size: 1.05rem;
+  }
 
   .theme-toggle {
     width: 36px;

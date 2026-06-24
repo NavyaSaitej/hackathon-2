@@ -8,7 +8,15 @@
  */
 
 import { generateDeck } from "./api.js";
-import { exportAnki, getSummaryData, initQuiz, nextCard, prevCard, toggleSound, renderReviewMistakes } from "./ui.js";
+import {
+  exportAnki,
+  getSummaryData,
+  initQuiz,
+  nextCard,
+  prevCard,
+  renderReviewMistakes,
+  toggleSound,
+} from "./ui.js";
 import { clearVideo, loadVideo } from "./video.js";
 
 // ── YouTube URL Regex ─────────────────────────
@@ -67,7 +75,7 @@ const i18n = {
     greatEffort: "Great effort!",
     exportAnkiBtn: "Export to Anki",
     newVideoBtn: "New Video",
-    loadingText: "Fetching transcript..."
+    loadingText: "Fetching transcript...",
   },
   Hindi: {
     heroSubtitle: "किसी भी YouTube वीडियो को इंटरैक्टिव क्विज़ फ्लैशकार्ड में बदलें — AI द्वारा संचालित।",
@@ -89,7 +97,7 @@ const i18n = {
     greatEffort: "बहुत बढ़िया प्रयास!",
     exportAnkiBtn: "Anki में निर्यात करें",
     newVideoBtn: "नया वीडियो",
-    loadingText: "ट्रांसक्रिप्ट प्राप्त कर रहा है..."
+    loadingText: "ट्रांसक्रिप्ट प्राप्त कर रहा है...",
   },
   Telugu: {
     heroSubtitle: "ఏదైనా YouTube వీడియోను ఇంటరాక్టివ్ క్విజ్ ఫ్లాష్‌కార్డ్‌లుగా మార్చండి — AI ద్వారా శక్తిని పొందుతుంది.",
@@ -111,14 +119,14 @@ const i18n = {
     greatEffort: "గొప్ప ప్రయత్నం!",
     exportAnkiBtn: "Anki కి ఎగుమతి చేయండి",
     newVideoBtn: "కొత్త వీడియో",
-    loadingText: "ట్రాన్స్క్రిప్ట్ పొందుతోంది..."
-  }
+    loadingText: "ట్రాన్స్క్రిప్ట్ పొందుతోంది...",
+  },
 };
 
 function updateLanguage(lang) {
   const dict = i18n[lang];
   if (!dict) return;
-  document.querySelectorAll("[data-i18n]").forEach(el => {
+  document.querySelectorAll("[data-i18n]").forEach((el) => {
     const key = el.getAttribute("data-i18n");
     if (dict[key]) {
       el.textContent = dict[key];
@@ -155,20 +163,20 @@ applyTheme();
 
 // ── Daily Streak Logic ────────────────────────
 function initStreakDisplay() {
-  const streak = parseInt(localStorage.getItem("streak_count")) || 0;
+  const streak = parseInt(localStorage.getItem("streak_count"), 10) || 0;
   const streakCountEl = document.getElementById("streak-count");
   if (streakCountEl) streakCountEl.textContent = streak;
 }
 
 function updateStreak() {
   const today = new Date().toDateString();
-  let streak = parseInt(localStorage.getItem("streak_count")) || 0;
+  let streak = parseInt(localStorage.getItem("streak_count"), 10) || 0;
   const lastPlayed = localStorage.getItem("last_played_date");
 
   if (lastPlayed !== today) {
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
-    
+
     if (lastPlayed === yesterday.toDateString()) {
       streak += 1;
     } else {
@@ -177,7 +185,7 @@ function updateStreak() {
     localStorage.setItem("streak_count", streak);
     localStorage.setItem("last_played_date", today);
   }
-  
+
   const streakCountEl = document.getElementById("streak-count");
   if (streakCountEl) streakCountEl.textContent = streak;
 }
@@ -188,7 +196,7 @@ themeToggle.addEventListener("click", () => {
   if (currentTheme === "dark") currentTheme = "light";
   else if (currentTheme === "light") currentTheme = "oled";
   else currentTheme = "dark";
-  
+
   localStorage.setItem("theme", currentTheme);
   applyTheme();
 });
@@ -196,8 +204,8 @@ themeToggle.addEventListener("click", () => {
 if (soundToggle) {
   soundToggle.addEventListener("click", () => {
     const isEnabled = toggleSound();
-    soundToggle.innerHTML = isEnabled 
-      ? '<i class="fa-solid fa-volume-high"></i>' 
+    soundToggle.innerHTML = isEnabled
+      ? '<i class="fa-solid fa-volume-high"></i>'
       : '<i class="fa-solid fa-volume-xmark"></i>';
   });
 }
@@ -313,7 +321,7 @@ if (btnInstall) {
   btnInstall.addEventListener("click", async () => {
     if (!deferredPrompt) return;
     deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
+    await deferredPrompt.userChoice;
     deferredPrompt = null;
     btnInstall.style.display = "none";
   });
@@ -321,7 +329,9 @@ if (btnInstall) {
 
 // ── State Transitions ─────────────────────────
 function showState(name) {
-  Object.values(states).forEach((s) => s.classList.remove("active"));
+  Object.values(states).forEach((s) => {
+    s.classList.remove("active");
+  });
   states[name].classList.add("active");
 }
 
@@ -358,7 +368,7 @@ function animateLoading(lang) {
       { text: "ట్రాన్స్క్రిప్ట్ పొందుతోంది...", progress: 25 },
       { text: "కంటెంట్ విశ్లేషిస్తోంది...", progress: 55 },
       { text: "క్విజ్ కార్డులు సృష్టిస్తోంది...", progress: 85 },
-    ]
+    ],
   };
 
   const stages = allStages[lang] || allStages.English;
@@ -387,7 +397,8 @@ btnGenerate.addEventListener("click", async () => {
 
     // Complete progress bar
     loadingProgress.style.width = "100%";
-    loadingStatus.textContent = language === "Hindi" ? "पूरा हुआ!" : language === "Telugu" ? "పూర్తయింది!" : "Done!";
+    loadingStatus.textContent =
+      language === "Hindi" ? "पूरा हुआ!" : language === "Telugu" ? "పూర్తయింది!" : "Done!";
 
     // Short pause to let user see completion
     await new Promise((r) => setTimeout(r, 500));
@@ -418,7 +429,7 @@ btnNext.addEventListener("click", () => {
     finalScore.textContent = data.score;
     totalCardsEl.textContent = data.total;
     summaryMessage.textContent = data.message;
-    
+
     updateStreak();
     renderReviewMistakes();
 
@@ -434,7 +445,7 @@ btnNext.addEventListener("click", () => {
 // ── Global Keyboard Shortcuts ────────────────
 document.addEventListener("keydown", (e) => {
   if (!states.quiz.classList.contains("active")) return;
-  
+
   if (e.key === "ArrowLeft") {
     if (!btnPrev.disabled) btnPrev.click();
   } else if (e.key === "ArrowRight") {
@@ -446,7 +457,7 @@ document.addEventListener("keydown", (e) => {
   } else if (["1", "2", "3", "4"].includes(e.key)) {
     const choicesContainer = document.getElementById("choices-container");
     const buttons = choicesContainer.querySelectorAll(".choice-btn");
-    const idx = parseInt(e.key) - 1;
+    const idx = parseInt(e.key, 10) - 1;
     if (buttons[idx] && !buttons[idx].disabled) {
       buttons[idx].click();
     }
@@ -461,11 +472,13 @@ if (btnShareResults) {
     const data = getSummaryData();
     const text = `I just scored ${data.score}/${data.total} on QuickCards AI Flashcards! 🧠⚡\n\nTry it out: ${window.location.href}`;
     if (navigator.share) {
-      navigator.share({
-        title: "My QuickCards Score",
-        text: text,
-        url: window.location.href
-      }).catch(console.error);
+      navigator
+        .share({
+          title: "My QuickCards Score",
+          text: text,
+          url: window.location.href,
+        })
+        .catch(console.error);
     } else {
       navigator.clipboard.writeText(text);
       alert("Score copied to clipboard!");

@@ -18,8 +18,6 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from models import Deck
 from scraper import process_video
-import re
-import random
 import gc
 import json
 import time
@@ -38,7 +36,6 @@ from slowapi.errors import RateLimitExceeded
 def safe_get_remote_address(request: Request) -> str:
     # Vercel serverless environment may not populate request.client
     return request.headers.get("x-forwarded-for", "127.0.0.1").split(",")[0]
-
 
 
 # Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
@@ -154,8 +151,6 @@ def determine_card_count(transcript: str) -> int:
         return 8
 
 
-
-
 def generate_offline_fallback_deck(transcript: str, language: str = "English") -> dict:
     if language == "Hindi":
         return {
@@ -164,11 +159,15 @@ def generate_offline_fallback_deck(transcript: str, language: str = "English") -
                 {
                     "question": "कस्टम वीडियो के लिए फ्लैशकार्ड क्यों नहीं बन पाए?",
                     "correct_answer": "AI जनरेशन कोटा समाप्त हो गया है।",
-                    "distractors": ["वीडियो में कोई आवाज़ नहीं है।", "इंटरनेट काम नहीं कर रहा है।", "वेबसाइट क्रैश हो गई है।"],
+                    "distractors": [
+                        "वीडियो में कोई आवाज़ नहीं है।",
+                        "इंटरनेट काम नहीं कर रहा है।",
+                        "वेबसाइट क्रैश हो गई है।",
+                    ],
                     "explanation": "यह एक ऑफ़लाइन फ़ॉलबैक कार्ड है क्योंकि हम वर्तमान में AI के साथ कनेक्ट नहीं कर पा रहे हैं। कृपया कुछ समय बाद पुनः प्रयास करें या डेमो वीडियो का उपयोग करें।",
-                    "timestamp_seconds": 0
+                    "timestamp_seconds": 0,
                 }
-            ]
+            ],
         }
     elif language == "Telugu":
         return {
@@ -177,11 +176,15 @@ def generate_offline_fallback_deck(transcript: str, language: str = "English") -
                 {
                     "question": "ఈ కస్టమ్ వీడియో కోసం ఫ్లాష్‌కార్డ్‌లు ఎందుకు సృష్టించబడలేదు?",
                     "correct_answer": "AI జనరేషన్ కోటా ముగిసింది.",
-                    "distractors": ["వీడియోలో వాయిస్ లేదు.", "ఇంటర్నెట్ పనిచేయడం లేదు.", "వెబ్‌సైట్ క్రాష్ అయింది."],
+                    "distractors": [
+                        "వీడియోలో వాయిస్ లేదు.",
+                        "ఇంటర్నెట్ పనిచేయడం లేదు.",
+                        "వెబ్‌సైట్ క్రాష్ అయింది.",
+                    ],
                     "explanation": "మేము ప్రస్తుతం AIకి కనెక్ట్ చేయలేకపోతున్నందున ఇది ఆఫ్‌లైన్ ఫాల్‌బ్యాక్ కార్డ్. దయచేసి కాసేపు ఆగి మళ్లీ ప్రయత్నించండి లేదా డెమో వీడియోని ఉపయోగించండి.",
-                    "timestamp_seconds": 0
+                    "timestamp_seconds": 0,
                 }
-            ]
+            ],
         }
     else:
         return {
@@ -190,11 +193,15 @@ def generate_offline_fallback_deck(transcript: str, language: str = "English") -
                 {
                     "question": "Why couldn't flashcards be generated for this custom video?",
                     "correct_answer": "The AI generation quota has been exhausted or API failed.",
-                    "distractors": ["The video has no audio.", "The internet is down.", "The website crashed."],
+                    "distractors": [
+                        "The video has no audio.",
+                        "The internet is down.",
+                        "The website crashed.",
+                    ],
                     "explanation": "This is an offline fallback card because we cannot connect to the AI currently. Please try again later or use the Demo Video.",
-                    "timestamp_seconds": 0
+                    "timestamp_seconds": 0,
                 }
-            ]
+            ],
         }
 
 
@@ -206,7 +213,11 @@ def generate_scraper_blocked_deck(error_msg: str, language: str = "English") -> 
                 {
                     "question": "ऐप इस वीडियो के लिए फ्लैशकार्ड क्यों नहीं बना सका?",
                     "correct_answer": "YouTube ने सर्वर को ब्लॉक कर दिया है।",
-                    "distractors": ["वीडियो में आवाज़ नहीं है", "AI ऑफ़लाइन है", "वीडियो निजी है"],
+                    "distractors": [
+                        "वीडियो में आवाज़ नहीं है",
+                        "AI ऑफ़लाइन है",
+                        "वीडियो निजी है",
+                    ],
                     "explanation": f"YouTube कभी-कभी सर्वरों को ट्रांसक्रिप्ट डाउनलोड करने से रोकता है। Error: {str(error_msg)[:50]}...",
                     "timestamp_seconds": 0,
                 }
@@ -232,7 +243,11 @@ def generate_scraper_blocked_deck(error_msg: str, language: str = "English") -> 
                 {
                     "question": "Why could the app not generate flashcards for this video?",
                     "correct_answer": "YouTube blocked the server for bot activity",
-                    "distractors": ["The video has no audio", "The AI is offline", "The video is private"],
+                    "distractors": [
+                        "The video has no audio",
+                        "The AI is offline",
+                        "The video is private",
+                    ],
                     "explanation": f"YouTube occasionally blocks cloud servers from downloading transcripts. Error: {str(error_msg)[:50]}...",
                     "timestamp_seconds": 0,
                 }
@@ -240,7 +255,13 @@ def generate_scraper_blocked_deck(error_msg: str, language: str = "English") -> 
         }
 
 
-def call_gemini_with_retry(transcript: str, card_count: int, video_id: str, language: str = "English", custom_client=None) -> Deck:
+def call_gemini_with_retry(
+    transcript: str,
+    card_count: int,
+    video_id: str,
+    language: str = "English",
+    custom_client=None,
+) -> Deck:
     """Call Gemini API with fallback models and hardcoded demo bypass.
 
     Returns a validated Deck object or raises HTTPException.
@@ -316,7 +337,11 @@ Transcript:
     if video_id == "Dq6dBoFor00":
         try:
             try:
-                from backend.demo_data import DEMO_DECK, DEMO_DECK_HINDI, DEMO_DECK_TELUGU
+                from backend.demo_data import (
+                    DEMO_DECK,
+                    DEMO_DECK_HINDI,
+                    DEMO_DECK_TELUGU,
+                )
             except ImportError:
                 from demo_data import DEMO_DECK, DEMO_DECK_HINDI, DEMO_DECK_TELUGU
             logger.info("Used hardcoded demo deck bypass.")
@@ -330,7 +355,10 @@ Transcript:
             logger.error(f"Failed to load demo deck: {e}")
 
     logger.error(f"All Gemini models failed. Last error: {last_error}")
-    raise HTTPException(status_code=429, detail="AI Quota Exceeded. Please configure a custom API Key (BYOK) or Local AI in Settings.")
+    raise HTTPException(
+        status_code=429,
+        detail="AI Quota Exceeded. Please configure a custom API Key (BYOK) or Local AI in Settings.",
+    )
 
 
 # --------------------------------------------------------------------------------------------------------------------------------
@@ -340,6 +368,7 @@ class GenerateRequest(BaseModel):
     url: str
     language: str = "English"
     api_key: str | None = None
+
 
 class TranscriptRequest(BaseModel):
     url: str
@@ -382,7 +411,7 @@ async def generate(request: Request, body: GenerateRequest):
 
         # Phase 2: Determine card count & call LLM
         card_count = determine_card_count(annotated_transcript)
-        
+
         custom_client = None
         if body.api_key:
             try:
@@ -390,7 +419,9 @@ async def generate(request: Request, body: GenerateRequest):
             except Exception as e:
                 logger.warning(f"Failed to init custom Gemini client: {e}")
 
-        deck = call_gemini_with_retry(annotated_transcript, card_count, video_id, body.language, custom_client)
+        deck = call_gemini_with_retry(
+            annotated_transcript, card_count, video_id, body.language, custom_client
+        )
 
         # Phase 3: Build response
         response_data = deck.model_dump()
@@ -421,6 +452,7 @@ async def generate(request: Request, body: GenerateRequest):
         response_data["video_id"] = extracted_id
         return response_data
 
+
 @app.post("/transcript")
 @limiter.limit("10/hour")
 async def get_transcript(request: Request, body: TranscriptRequest):
@@ -434,4 +466,3 @@ async def get_transcript(request: Request, body: TranscriptRequest):
         return {"video_id": video_id, "transcript": annotated_transcript}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
-

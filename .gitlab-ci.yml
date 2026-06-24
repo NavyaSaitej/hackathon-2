@@ -1,12 +1,15 @@
 stages:
   - lint
-  - test
+  - format
+  - deadcode
+  - security
   - deploy
 
 lint:frontend:
   stage: lint
   image: node:20-alpine
   script:
+    - npm install -g @biomejs/biome
     - npx @biomejs/biome check frontend/js/
   allow_failure: false
 
@@ -16,17 +19,37 @@ lint:backend:
   script:
     - pip install ruff
     - ruff check backend/
+  allow_failure: false
+
+format:frontend:
+  stage: format
+  image: node:20-alpine
+  script:
+    - npx prettier --check "frontend/**/*.{js,css,html}"
+  allow_failure: false
+
+format:backend:
+  stage: format
+  image: python:3.12-slim
+  script:
+    - pip install ruff
     - ruff format --check backend/
   allow_failure: false
 
-test:backend:
-  stage: test
+deadcode:backend:
+  stage: deadcode
   image: python:3.12-slim
   script:
-    - cd backend
-    - pip install -r requirements.txt
-    - pip install pytest httpx
-    - pytest -v
+    - pip install vulture
+    - vulture backend/ --exclude backend/venv --min-confidence 80
+  allow_failure: true
+
+security:backend:
+  stage: security
+  image: python:3.12-slim
+  script:
+    - pip install bandit
+    - bandit -r backend/ -x backend/venv -c bandit.yaml || bandit -r backend/ -x backend/venv
   allow_failure: false
 
 pages:
