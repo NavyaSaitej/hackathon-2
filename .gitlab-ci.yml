@@ -55,8 +55,7 @@ security:backend:
 pages:
   stage: deploy
   script:
-    - mkdir -p public
-    - cp -r frontend/* public/
+    - python -c "import shutil, os; os.makedirs('public', exist_ok=True); shutil.copytree('frontend', 'public', dirs_exist_ok=True)"
   artifacts:
     paths:
       - public
