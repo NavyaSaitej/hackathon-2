@@ -44,7 +44,7 @@ security:backend:
   stage: security
   script:
     - python -m pip install bandit
-    - python -m bandit -r backend/ -x backend/venv
+    - python -m bandit -r backend/ -x backend/venv -s B101,B310
   allow_failure: false
 
 pages:

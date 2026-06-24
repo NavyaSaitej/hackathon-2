@@ -7,11 +7,11 @@
 
 // Backend URL — update for production
 const API_BASE =
-  window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
-    ? "http://localhost:8080"
-    : ""; // Use relative path on Vercel
+  window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? 'http://localhost:8080'
+    : ''; // Use relative path on Vercel
 
-const APP_SECRET = "quickcards-dev-secret"; // Must match backend .env
+const APP_SECRET = 'quickcards-dev-secret'; // Must match backend .env
 
 /**
  * Send a YouTube URL to the backend and receive a quiz deck.
@@ -20,24 +20,24 @@ const APP_SECRET = "quickcards-dev-secret"; // Must match backend .env
  * @returns {Promise<Object>} The deck JSON
  * @throws {Error} with user-friendly message
  */
-export async function generateDeck(url, language = "English") {
-  let aiProvider = localStorage.getItem("ai_provider") || "gemini";
-  const apiKey = localStorage.getItem("gemini_api_key") || "";
-  const localEndpoint = localStorage.getItem("local_endpoint") || "http://localhost:11434/api/chat";
-  const localModel = localStorage.getItem("local_model") || "llama3";
+export async function generateDeck(url, language = 'English') {
+  let aiProvider = localStorage.getItem('ai_provider') || 'gemini';
+  const apiKey = localStorage.getItem('gemini_api_key') || '';
+  const localEndpoint = localStorage.getItem('local_endpoint') || 'http://localhost:11434/api/chat';
+  const localModel = localStorage.getItem('local_model') || 'llama3';
 
   // Force default Gemini provider for the hardcoded Demo Video to ensure it remains instant
-  if (url.includes("Dq6dBoFor00")) {
-    aiProvider = "gemini";
+  if (url.includes('Dq6dBoFor00')) {
+    aiProvider = 'gemini';
   }
 
-  if (aiProvider === "local") {
+  if (aiProvider === 'local') {
     // 1. Fetch transcript from backend
     const transcriptRes = await fetch(`${API_BASE}/transcript`, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
-        "X-App-Secret": APP_SECRET,
+        'Content-Type': 'application/json',
+        'X-App-Secret': APP_SECRET,
       },
       body: JSON.stringify({ url }),
     });
@@ -78,7 +78,7 @@ OUTPUT FORMAT (strict JSON, no markdown fences):
 }`;
 
     // Calculate approx cards like backend does
-    const wordCount = transcript.split(" ").length;
+    const wordCount = transcript.split(' ').length;
     let cardCount = 3;
     if (wordCount >= 500 && wordCount < 1500) cardCount = 5;
     else if (wordCount >= 1500) cardCount = 8;
@@ -93,16 +93,16 @@ ${transcript}`;
     let ollamaRes;
     try {
       ollamaRes = await fetch(localEndpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           model: localModel,
           messages: [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: userPrompt },
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: userPrompt },
           ],
           stream: false,
-          format: "json",
+          format: 'json',
           options: { temperature: 0.0 },
         }),
       });
@@ -112,7 +112,7 @@ ${transcript}`;
           `If using localhost, modern browsers block public sites from accessing local ports (Private Network Access).\n` +
           `Workarounds:\n` +
           `1. Run 'ngrok http 11434' and paste the ngrok HTTPS URL here.\n` +
-          `2. Or, run this website locally on your machine.`,
+          `2. Or, run this website locally on your machine.`
       );
     }
 
@@ -126,21 +126,21 @@ ${transcript}`;
       parsed.video_id = video_id;
       return parsed;
     } catch (_e) {
-      throw new Error("Failed to parse JSON from Local AI.");
+      throw new Error('Failed to parse JSON from Local AI.');
     }
   }
 
   // Gemini (Default or BYOK)
   const body = { url, language };
-  if (aiProvider === "byok" && apiKey) {
+  if (aiProvider === 'byok' && apiKey) {
     body.api_key = apiKey;
   }
 
   const response = await fetch(`${API_BASE}/generate`, {
-    method: "POST",
+    method: 'POST',
     headers: {
-      "Content-Type": "application/json",
-      "X-App-Secret": APP_SECRET,
+      'Content-Type': 'application/json',
+      'X-App-Secret': APP_SECRET,
     },
     body: JSON.stringify(body),
   });
