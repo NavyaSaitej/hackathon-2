@@ -1,21 +1,25 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.4.16/schema.json",
-  "linter": {
-    "enabled": true,
-    "rules": {
-        "recommended": true,
-        "correctness": {
-            "noUnusedVariables": "warn"
-        },
-        "suspicious": {
-            "noConsoleLog": "off"
-        }
-    }
-  },
-  "formatter": {
-    "enabled": false
-  },
-  "files": {
-    "includes": ["**/frontend/**/*.js", "!**/node_modules", "!**/frontend/sw.js"]
-  }
+	"$schema": "https://biomejs.dev/schemas/2.5.1/schema.json",
+	"linter": {
+		"enabled": true,
+		"rules": {
+			"preset": "recommended",
+			"correctness": {
+				"noUnusedVariables": "warn"
+			},
+			"suspicious": {
+				"noConsole": "off"
+			}
+		}
+	},
+	"formatter": {
+		"enabled": false
+	},
+	"files": {
+		"includes": [
+			"**/frontend/**/*.js",
+			"!**/node_modules",
+			"!**/frontend/sw.js"
+		]
+	}
 }
