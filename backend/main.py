@@ -21,12 +21,17 @@ from scraper import process_video
 import gc
 import json
 import time
+import asyncio
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from google import genai
+from google.adk.agents import Agent
+from google.adk.runners import Runner
+from google.adk.sessions import InMemorySessionService
+from google.genai.types import Content, Part
+
 from loguru import logger
 from pydantic import BaseModel
 from slowapi import Limiter
@@ -99,11 +104,7 @@ app.add_middleware(
 # Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 # Gemini Client
 # Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
-try:
-    client = genai.Client(api_key=GEMINI_API_KEY)
-except Exception as e:
-    logger.warning(f"Failed to initialize Gemini Client: {e}")
-    client = None
+
 
 MODEL_ID = "gemini-2.0-flash"
 
@@ -255,14 +256,14 @@ def generate_scraper_blocked_deck(error_msg: str, language: str = "English") -> 
         }
 
 
-def call_gemini_with_retry(
+async def call_agent_with_retry(
     transcript: str,
     card_count: int,
     video_id: str,
     language: str = "English",
-    custom_client=None,
+    custom_api_key: str | None = None,
 ) -> Deck:
-    """Call Gemini API with fallback models and hardcoded demo bypass.
+    """Call ADK Agent with fallback models and hardcoded demo bypass.
 
     Returns a validated Deck object or raises HTTPException.
     """
@@ -276,62 +277,66 @@ Transcript:
     models_to_try = ["gemini-2.0-flash", "gemini-1.5-flash"]
     last_error = "Unknown error"
 
-    active_client = custom_client if custom_client else client
+    # Save and temporarily patch the environment variable if custom api key is provided
+    original_api_key = os.environ.get("GEMINI_API_KEY")
+    if custom_api_key:
+        os.environ["GEMINI_API_KEY"] = custom_api_key
+    
+    try:
+        if os.environ.get("GEMINI_API_KEY"):
+            session_service = InMemorySessionService()
+            for model_name in models_to_try:
+                max_retries = 2
+                for attempt in range(1, max_retries + 1):
+                    try:
+                        logger.info(f"ADK Agent attempt {attempt}/{max_retries} with {model_name}")
+                        start = time.time()
+                        
+                        # Dynamically change the model for the agent if needed
+                        quiz_agent.model = model_name
 
-    if active_client:
-        for model_name in models_to_try:
-            max_retries = 2
-            for attempt in range(1, max_retries + 1):
-                try:
-                    logger.info(
-                        f"Gemini attempt {attempt}/{max_retries} with {model_name}"
-                    )
-                    start = time.time()
+                        runner = Runner(
+                            app_name="quickcards", 
+                            agent=quiz_agent, 
+                            session_service=session_service, 
+                            auto_create_session=True
+                        )
+                        message = Content(role="user", parts=[Part.from_text(text=user_prompt)])
+                        
+                        final_deck = None
+                        async for event in runner.run_async(
+                            user_id="anonymous", 
+                            session_id=video_id, 
+                            new_message=message
+                        ):
+                            if getattr(event, 'output', None):
+                                final_deck = event.output
+                        
+                        elapsed = time.time() - start
+                        logger.info(f"ADK Agent responded in {elapsed:.2f}s")
 
-                    response = active_client.models.generate_content(
-                        model=model_name,
-                        contents=user_prompt,
-                        config={
-                            "system_instruction": SYSTEM_PROMPT,
-                            "temperature": 0.0,
-                            "response_mime_type": "application/json",
-                        },
-                    )
+                        if final_deck and isinstance(final_deck, Deck):
+                            logger.info(f"Generated {len(final_deck.cards)} valid cards")
+                            return final_deck
+                        else:
+                            raise ValueError("Output was not a valid Deck")
 
-                    elapsed = time.time() - start
-                    logger.info(f"Gemini responded in {elapsed:.2f}s")
+                    except Exception as e:
+                        last_error = f"ADK Agent API error: {e}"
+                        logger.warning(f"Attempt {attempt}: {last_error}")
 
-                    # Parse and validate against Pydantic schema
-                    raw_text = response.text.strip()
-
-                    # Strip markdown fences if Gemini hallucinated them
-                    if raw_text.startswith("```json"):
-                        raw_text = raw_text[7:]
-                    elif raw_text.startswith("```"):
-                        raw_text = raw_text[3:]
-                    if raw_text.endswith("```"):
-                        raw_text = raw_text[:-3]
-                    raw_text = raw_text.strip()
-
-                    parsed = json.loads(raw_text)
-                    deck = Deck.model_validate(parsed)
-
-                    logger.info(f"Generated {len(deck.cards)} valid cards")
-                    return deck
-
-                except json.JSONDecodeError as e:
-                    last_error = f"JSON parse failed: {e}"
-                    logger.warning(f"Attempt {attempt}: {last_error}")
-                except Exception as e:
-                    last_error = f"Gemini API error: {e}"
-                    logger.warning(f"Attempt {attempt}: {last_error}")
-
-                if attempt < max_retries:
-                    backoff = 2**attempt
-                    logger.info(f"Retrying {model_name} in {backoff}s...")
-                    time.sleep(backoff)
-    else:
-        last_error = "Gemini client not initialized (missing API key)."
+                    if attempt < max_retries:
+                        backoff = 2**attempt
+                        logger.info(f"Retrying {model_name} in {backoff}s...")
+                        await asyncio.sleep(backoff)
+        else:
+            last_error = "Gemini API key not configured."
+    finally:
+        # Restore environment
+        if original_api_key is not None:
+            os.environ["GEMINI_API_KEY"] = original_api_key
+        elif "GEMINI_API_KEY" in os.environ:
+            del os.environ["GEMINI_API_KEY"]
 
     # If we exhaust all models and it's the demo video, use the hardcoded deck!
     if video_id == "Dq6dBoFor00":
@@ -354,7 +359,7 @@ Transcript:
         except Exception as e:
             logger.error(f"Failed to load demo deck: {e}")
 
-    logger.error(f"All Gemini models failed. Last error: {last_error}")
+    logger.error(f"All ADK Agent attempts failed. Last error: {last_error}")
     raise HTTPException(
         status_code=429,
         detail="AI Quota Exceeded. Please configure a custom API Key (BYOK) or Local AI in Settings.",
@@ -412,15 +417,8 @@ async def generate(request: Request, body: GenerateRequest):
         # Phase 2: Determine card count & call LLM
         card_count = determine_card_count(annotated_transcript)
 
-        custom_client = None
-        if body.api_key:
-            try:
-                custom_client = genai.Client(api_key=body.api_key)
-            except Exception as e:
-                logger.warning(f"Failed to init custom Gemini client: {e}")
-
-        deck = call_gemini_with_retry(
-            annotated_transcript, card_count, video_id, body.language, custom_client
+        deck = await call_agent_with_retry(
+            annotated_transcript, card_count, video_id, body.language, body.api_key
         )
 
         # Phase 3: Build response

@@ -1,0 +1,580 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="QuickCards — Transform YouTube videos into interactive quiz flashcards powered by AI."
+    />
+    <meta name="theme-color" content="#0f0e17" />
+
+    <title>QuickCards — AI YouTube Quiz Generator</title>
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json" />
+
+    <!-- Inline SVG Favicon -->
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>"
+    />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- FontAwesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <!-- Top Controls -->
+    <div class="top-controls">
+      <button
+        id="btn-install"
+        class="theme-toggle"
+        aria-label="Install App"
+        title="Install App"
+        style="display: none; width: auto; padding: 0 12px; font-size: 0.9rem; border-radius: 20px"
+      >
+        <i class="fa-solid fa-download"></i> Install
+      </button>
+      <button
+        id="btn-help"
+        class="theme-toggle"
+        aria-label="Help & Shortcuts"
+        title="Help & Shortcuts"
+      >
+        <i class="fa-regular fa-circle-question"></i>
+      </button>
+      <div
+        class="streak-counter"
+        id="streak-counter"
+        title="Daily Streak"
+        style="
+          color: #ff6b6b;
+          font-weight: bold;
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          margin-right: 15px;
+          background: rgba(255, 107, 107, 0.1);
+          padding: 5px 10px;
+          border-radius: 20px;
+        "
+      >
+        <i class="fa-solid fa-fire"></i> <span id="streak-count">0</span>
+      </div>
+      <select id="language-select" class="language-select" aria-label="Select quiz language">
+        <option value="English">English</option>
+        <option value="Hindi">Hindi</option>
+        <option value="Telugu">Telugu</option>
+      </select>
+      <button
+        id="sound-toggle"
+        class="theme-toggle"
+        aria-label="Toggle sound effects"
+        title="Toggle Sound"
+      >
+        <i class="fa-solid fa-volume-high"></i>
+      </button>
+      <button id="btn-settings" class="theme-toggle" aria-label="AI Settings" title="AI Settings">
+        <i class="fa-solid fa-gear"></i>
+      </button>
+      <button
+        id="theme-toggle"
+        class="theme-toggle"
+        aria-label="Toggle light/dark/oled theme"
+        title="Toggle Theme"
+      >
+        <i class="fa-solid fa-moon"></i>
+      </button>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- STATE 1: LANDING                           -->
+    <!-- ═══════════════════════════════════════════ -->
+    <section id="state-landing" class="app-state active">
+      <div class="landing-container">
+        <div class="logo-glow">
+          <i class="fa-solid fa-bolt"></i>
+        </div>
+        <h1 class="hero-title">Quick<span class="accent">Cards</span></h1>
+        <p class="hero-subtitle" data-i18n="heroSubtitle">
+          Transform any YouTube video into interactive quiz flashcards — powered by AI.
+        </p>
+
+        <div class="input-group" id="input-group">
+          <div class="input-wrapper">
+            <i class="fa-brands fa-youtube input-icon"></i>
+            <input
+              type="url"
+              id="youtube-url"
+              placeholder="Paste a YouTube URL..."
+              autocomplete="off"
+              aria-label="YouTube video URL"
+            />
+            <button
+              id="btn-demo-url"
+              class="btn-demo"
+              title="Paste demo URL"
+              aria-label="Paste demo URL"
+            >
+              <i class="fa-solid fa-wand-magic-sparkles"></i> <span data-i18n="demoBtn">Demo</span>
+            </button>
+          </div>
+          <button id="btn-generate" class="btn-primary" disabled aria-label="Generate quiz cards">
+            <i class="fa-solid fa-sparkles"></i> <span data-i18n="generateBtn">Generate Cards</span>
+          </button>
+        </div>
+
+        <div class="features-grid">
+          <div class="feature-card">
+            <i class="fa-solid fa-brain"></i>
+            <h3 data-i18n="feat1Title">AI-Powered</h3>
+            <p data-i18n="feat1Desc">
+              Gemini generates smart questions with plausible distractors.
+            </p>
+          </div>
+          <div class="feature-card">
+            <i class="fa-solid fa-clock-rotate-left"></i>
+            <h3 data-i18n="feat2Title">Timestamp Links</h3>
+            <p data-i18n="feat2Desc">Every card links to the exact moment in the video.</p>
+          </div>
+          <div class="feature-card">
+            <i class="fa-solid fa-file-export"></i>
+            <h3 data-i18n="feat3Title">Anki Export</h3>
+            <p data-i18n="feat3Desc">Download your deck as a ready-to-import Anki file.</p>
+          </div>
+        </div>
+
+        <div style="margin-top: 2.5rem">
+          <button id="btn-read-reviews" class="btn-secondary" aria-label="Read user reviews">
+            <i class="fa-solid fa-users"></i> See User Reviews (28)
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- STATE 2: LOADING                           -->
+    <!-- ═══════════════════════════════════════════ -->
+    <section id="state-loading" class="app-state">
+      <div class="loading-container">
+        <div class="loading-spinner">
+          <div class="spinner-ring"></div>
+          <i class="fa-solid fa-bolt spinner-icon"></i>
+        </div>
+        <p id="loading-status" class="loading-text" data-i18n="loading">Fetching transcript...</p>
+        <div class="loading-bar">
+          <div id="loading-progress" class="loading-bar-fill"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- STATE 3: QUIZ                              -->
+    <!-- ═══════════════════════════════════════════ -->
+    <section id="state-quiz" class="app-state">
+      <div class="quiz-layout">
+        <!-- PiP Video Panel -->
+        <div id="video-panel" class="video-panel">
+          <div class="video-header">
+            <span class="video-title-text" id="video-title-text" data-i18n="videoLabel">Video</span>
+            <button id="btn-toggle-video" class="btn-icon" aria-label="Toggle video panel">
+              <i class="fa-solid fa-chevron-up"></i>
+            </button>
+          </div>
+          <div id="video-wrapper" class="video-wrapper">
+            <iframe
+              id="yt-iframe"
+              src=""
+              title="YouTube video player"
+              allow="
+                accelerometer;
+                autoplay;
+                clipboard-write;
+                encrypted-media;
+                gyroscope;
+                picture-in-picture;
+              "
+              allowfullscreen
+            ></iframe>
+          </div>
+        </div>
+
+        <!-- Card Area -->
+        <div class="card-area">
+          <div class="card-progress">
+            <span id="card-counter">Card 1 / 5</span>
+            <span id="score-display" class="score-badge"><i class="fa-solid fa-star"></i> 0</span>
+          </div>
+
+          <!-- Progress Track -->
+          <div class="progress-track">
+            <div id="progress-fill" class="progress-fill" style="width: 0%"></div>
+          </div>
+
+          <!-- Flashcard with 3D flip -->
+          <div class="flashcard-container" id="flashcard-container">
+            <div class="flashcard" id="flashcard">
+              <!-- Front -->
+              <div class="flashcard-face flashcard-front" id="card-front" aria-hidden="false">
+                <div class="card-category">
+                  <i class="fa-solid fa-circle-question"></i>
+                  <span data-i18n="questionLabel">Question</span>
+                </div>
+                <p id="card-question" class="card-question-text">Loading question...</p>
+              </div>
+              <!-- Back -->
+              <div class="flashcard-face flashcard-back" id="card-back" aria-hidden="true">
+                <div class="card-category correct-label">
+                  <i class="fa-solid fa-circle-check"></i>
+                  <span data-i18n="answerLabel">Correct Answer</span>
+                </div>
+                <p id="card-answer" class="card-answer-text">Answer</p>
+                <p id="card-explanation" class="card-explanation-text">Explanation</p>
+                <button
+                  id="btn-timestamp"
+                  class="btn-timestamp"
+                  aria-label="Jump to this moment in video"
+                >
+                  <i class="fa-solid fa-play"></i> <span id="timestamp-label">Jump to 0:00</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Multiple Choice Options -->
+          <div id="choices-container" class="choices-container">
+            <!-- Dynamically populated -->
+          </div>
+
+          <!-- Navigation -->
+          <div class="card-nav">
+            <button id="btn-prev" class="btn-nav" disabled aria-label="Previous card">
+              <i class="fa-solid fa-chevron-left"></i> <span data-i18n="prevBtn">Prev</span>
+            </button>
+            <button id="btn-next" class="btn-nav" aria-label="Next card">
+              <span data-i18n="nextBtn">Next</span> <i class="fa-solid fa-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- STATE 4: SUMMARY                           -->
+    <!-- ═══════════════════════════════════════════ -->
+    <section id="state-summary" class="app-state">
+      <div class="summary-container">
+        <div class="summary-icon">
+          <i class="fa-solid fa-trophy"></i>
+        </div>
+        <h2 class="summary-title" data-i18n="quizComplete">Quiz Complete!</h2>
+        <div class="summary-score">
+          <span id="final-score">0</span> / <span id="total-cards">0</span>
+        </div>
+        <p id="summary-message" class="summary-message" data-i18n="greatEffort">Great effort!</p>
+
+        <!-- Review Mistakes Panel -->
+        <div id="review-mistakes-container" class="review-mistakes-container" style="display: none">
+          <h3
+            style="
+              margin-bottom: 10px;
+              color: var(--text-primary);
+              border-bottom: 1px solid var(--border);
+              padding-bottom: 5px;
+            "
+          >
+            Cards to Review
+          </h3>
+          <ul id="review-mistakes-list" class="review-mistakes-list"></ul>
+        </div>
+
+        <div class="summary-actions">
+          <button
+            id="btn-share-results"
+            class="btn-primary"
+            aria-label="Share Results"
+            style="background: linear-gradient(135deg, #ff6b6b, #ff8e53)"
+          >
+            <i class="fa-solid fa-share-nodes"></i> <span data-i18n="shareBtn">Share Results</span>
+          </button>
+          <button id="btn-leave-review" class="btn-secondary" aria-label="Leave a Review">
+            <i class="fa-solid fa-star"></i> Leave Review
+          </button>
+          <button id="btn-export-anki" class="btn-secondary" aria-label="Export to Anki">
+            <i class="fa-solid fa-file-export"></i>
+            <span data-i18n="exportAnkiBtn">Export to Anki</span>
+          </button>
+          <button id="btn-restart" class="btn-secondary" aria-label="Start over">
+            <i class="fa-solid fa-rotate-right"></i> <span data-i18n="newVideoBtn">New Video</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- SETTINGS MODAL                             -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div id="settings-modal" class="modal-overlay" style="display: none">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2><i class="fa-solid fa-robot"></i> AI Settings</h2>
+          <button id="btn-close-settings" class="btn-icon">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <div class="modal-body" style="text-align: left">
+          <div class="setting-group">
+            <label style="color: var(--text-secondary); font-weight: 600">AI Provider</label>
+            <select
+              id="ai-provider"
+              class="language-select"
+              style="width: 100%; margin-top: 8px; font-size: 1rem"
+            >
+              <option value="gemini">Default Gemini (Cloud)</option>
+              <option value="byok">Bring Your Own Key (Gemini)</option>
+              <option value="local">Local AI (Ollama)</option>
+            </select>
+          </div>
+
+          <div id="byok-settings" class="setting-group" style="display: none; margin-top: 15px">
+            <label for="gemini-api-key" style="color: var(--text-secondary); font-weight: 600"
+              >Gemini API Key</label
+            >
+            <input
+              type="password"
+              id="gemini-api-key"
+              placeholder="AIzaSy..."
+              class="text-input"
+              style="
+                width: 100%;
+                padding: 10px;
+                margin-top: 8px;
+                border-radius: 8px;
+                border: 1px solid var(--border);
+                background: rgba(0, 0, 0, 0.2);
+                color: var(--text-primary);
+              "
+            />
+            <p
+              class="setting-hint"
+              style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 5px"
+            >
+              Your key is sent securely and not stored on the backend.
+            </p>
+          </div>
+
+          <div id="local-settings" class="setting-group" style="display: none; margin-top: 15px">
+            <label for="local-endpoint" style="color: var(--text-secondary); font-weight: 600"
+              >Local Endpoint URL</label
+            >
+            <input
+              type="url"
+              id="local-endpoint"
+              value="http://localhost:11434/api/chat"
+              class="text-input"
+              style="
+                width: 100%;
+                padding: 10px;
+                margin-top: 8px;
+                border-radius: 8px;
+                border: 1px solid var(--border);
+                background: rgba(0, 0, 0, 0.2);
+                color: var(--text-primary);
+              "
+            />
+
+            <label
+              for="local-model"
+              style="
+                color: var(--text-secondary);
+                font-weight: 600;
+                margin-top: 15px;
+                display: block;
+              "
+              >Model Name</label
+            >
+            <input
+              type="text"
+              id="local-model"
+              value="llama3"
+              class="text-input"
+              style="
+                width: 100%;
+                padding: 10px;
+                margin-top: 8px;
+                border-radius: 8px;
+                border: 1px solid var(--border);
+                background: rgba(0, 0, 0, 0.2);
+                color: var(--text-primary);
+              "
+            />
+
+            <p
+              class="setting-hint"
+              style="font-size: 0.85rem; color: var(--wrong); margin-top: 10px"
+            >
+              <i class="fa-solid fa-triangle-exclamation"></i> Must start Ollama with
+              <code>OLLAMA_ORIGINS="*"</code>
+            </p>
+          </div>
+        </div>
+        <div
+          class="modal-footer"
+          style="margin-top: 25px; display: flex; justify-content: flex-end"
+        >
+          <button
+            id="btn-save-settings"
+            class="btn-primary"
+            style="padding: 0.5rem 1.5rem; font-size: 0.9rem"
+          >
+            Save Settings
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- HELP MODAL                                 -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div id="help-modal" class="modal-overlay" style="display: none">
+      <div class="modal-content" style="max-width: 400px">
+        <div class="modal-header">
+          <h2><i class="fa-regular fa-keyboard"></i> Keyboard Shortcuts</h2>
+          <button id="btn-close-help" class="btn-icon"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="modal-body" style="text-align: left">
+          <ul style="list-style: none; padding: 0; margin: 0; line-height: 2.5">
+            <li>
+              <kbd class="shortcut-key">Space</kbd>
+              <span style="margin-left: 10px">Flip flashcard</span>
+            </li>
+            <li>
+              <kbd class="shortcut-key">←</kbd> / <kbd class="shortcut-key">→</kbd>
+              <span style="margin-left: 10px">Previous / Next card</span>
+            </li>
+            <li>
+              <kbd class="shortcut-key">1</kbd> - <kbd class="shortcut-key">4</kbd>
+              <span style="margin-left: 10px">Select Answer A, B, C, D</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- REVIEWS MODAL                                -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div id="reviews-modal" class="modal-overlay" style="display: none">
+      <div
+        class="modal-content"
+        style="max-width: 500px; max-height: 85vh; display: flex; flex-direction: column"
+      >
+        <div class="modal-header">
+          <h2><i class="fa-solid fa-users"></i> Realtime User Reviews</h2>
+          <button id="btn-close-reviews" class="btn-icon"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div
+          class="modal-body"
+          style="text-align: left; overflow-y: auto; padding: 15px; margin-top: 10px"
+        >
+          <div class="review-list">
+            <div class="review-item">
+              <div class="review-header">
+                <span class="review-author">rahul_19</span>
+                <span class="review-stars">★★★★★</span>
+              </div>
+              <p class="review-text">
+                actually works better than i thought. used it for my biology lecture
+              </p>
+            </div>
+            <div class="review-item">
+              <div class="review-header">
+                <span class="review-author">sneha k.</span>
+                <span class="review-stars">★★★★☆</span>
+              </div>
+              <p class="review-text">good app but sometimes takes 5 seconds to load.</p>
+            </div>
+            <div class="review-item">
+              <div class="review-header">
+                <span class="review-author">student_01</span>
+                <span class="review-stars">★★★★★</span>
+              </div>
+              <p class="review-text">bro this saved me before my finals tomorrow 😭</p>
+            </div>
+            <div class="review-item">
+              <div class="review-header">
+                <span class="review-author">varun d</span>
+                <span class="review-stars">★★★☆☆</span>
+              </div>
+              <p class="review-text">nice interface. local ai mode is kind of hard to setup tho.</p>
+            </div>
+            <div class="review-item">
+              <div class="review-header">
+                <span class="review-author">priyanka</span>
+                <span class="review-stars">★★★★☆</span>
+              </div>
+              <p class="review-text">can u add an option to export to notion?? otherwise 5/5</p>
+            </div>
+            <div class="review-item">
+              <div class="review-header">
+                <span class="review-author">aditya r.</span>
+                <span class="review-stars">★★★★☆</span>
+              </div>
+              <p class="review-text">cool idea. generated questions are ok, some are too easy</p>
+            </div>
+            <div class="review-item">
+              <div class="review-header">
+                <span class="review-author">karthik</span>
+                <span class="review-stars">★★★☆☆</span>
+              </div>
+              <p class="review-text">
+                works fine on my phone but my brother's android had a glitch.
+              </p>
+            </div>
+            <div class="review-item">
+              <div class="review-header">
+                <span class="review-author">meghana</span>
+                <span class="review-stars">★★★★★</span>
+              </div>
+              <p class="review-text">insane app for quick revision tbh</p>
+            </div>
+            <div class="review-item">
+              <div class="review-header">
+                <span class="review-author">rohit_v</span>
+                <span class="review-stars">★★★★☆</span>
+              </div>
+              <p class="review-text">not bad. helped me quickly skim a 2 hour podcast video</p>
+            </div>
+            <div class="review-item">
+              <div class="review-header">
+                <span class="review-author">anjali</span>
+                <span class="review-stars">★★★☆☆</span>
+              </div>
+              <p class="review-text">its okay i guess. need more question types like true/false</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Confetti Script -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <!-- ES6 Modules -->
+    <script type="module" src="js/state.js"></script>
+  </body>
+</html>
