@@ -65,7 +65,7 @@ app.state.limiter = limiter
 
 # Rate limit exceeded handler
 @app.exception_handler(RateLimitExceeded)
-async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
+async def rate_limit_handler(request: Request, _exc: RateLimitExceeded):
     return JSONResponse(
         status_code=429,
         content={
