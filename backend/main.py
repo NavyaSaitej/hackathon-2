@@ -27,7 +27,7 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from google.adk.agents import Agent
-from google.adk.models.google_llm import GoogleLlm
+from google.adk.models import Gemini
 from google.adk.runners import Runner
 from google.adk.sessions import InMemorySessionService
 from google.genai.types import Content, Part
@@ -140,9 +140,9 @@ OUTPUT FORMAT (strict JSON, no markdown fences):
 
 quiz_agent = Agent(
     name="quiz_agent",
-    model=GoogleLlm(model_name=MODEL_ID),
+    model=Gemini(model_name=MODEL_ID),
     instruction=SYSTEM_PROMPT,
-    output_schema=Deck
+    output_schema=Deck,
 )
 
 
@@ -290,7 +290,7 @@ Transcript:
     original_api_key = os.environ.get("GEMINI_API_KEY")
     if custom_api_key:
         os.environ["GEMINI_API_KEY"] = custom_api_key
-    
+
     try:
         if os.environ.get("GEMINI_API_KEY"):
             session_service = InMemorySessionService()
@@ -298,34 +298,40 @@ Transcript:
                 max_retries = 2
                 for attempt in range(1, max_retries + 1):
                     try:
-                        logger.info(f"ADK Agent attempt {attempt}/{max_retries} with {model_name}")
+                        logger.info(
+                            f"ADK Agent attempt {attempt}/{max_retries} with {model_name}"
+                        )
                         start = time.time()
-                        
+
                         # Dynamically change the model for the agent if needed
                         quiz_agent.model = model_name
 
                         runner = Runner(
-                            app_name="quickcards", 
-                            agent=quiz_agent, 
-                            session_service=session_service, 
-                            auto_create_session=True
+                            app_name="quickcards",
+                            agent=quiz_agent,
+                            session_service=session_service,
+                            auto_create_session=True,
                         )
-                        message = Content(role="user", parts=[Part.from_text(text=user_prompt)])
-                        
+                        message = Content(
+                            role="user", parts=[Part.from_text(text=user_prompt)]
+                        )
+
                         final_deck = None
                         async for event in runner.run_async(
-                            user_id="anonymous", 
-                            session_id=video_id, 
-                            new_message=message
+                            user_id="anonymous",
+                            session_id=video_id,
+                            new_message=message,
                         ):
-                            if getattr(event, 'output', None):
+                            if getattr(event, "output", None):
                                 final_deck = event.output
-                        
+
                         elapsed = time.time() - start
                         logger.info(f"ADK Agent responded in {elapsed:.2f}s")
 
                         if final_deck and isinstance(final_deck, Deck):
-                            logger.info(f"Generated {len(final_deck.cards)} valid cards")
+                            logger.info(
+                                f"Generated {len(final_deck.cards)} valid cards"
+                            )
                             return final_deck
                         else:
                             raise ValueError("Output was not a valid Deck")
