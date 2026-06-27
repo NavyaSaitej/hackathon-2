@@ -1,14 +1,14 @@
 import asyncio
-import os
 from pydantic import BaseModel
 from dotenv import load_dotenv
 
-load_dotenv()
 from google.adk.agents import Agent
 from google.adk.runners import Runner
 from google.adk.sessions import InMemorySessionService
 from google.adk.models.google_llm import GoogleLlm
 from google.genai.types import Content, Part
+
+load_dotenv()
 
 class TestOutput(BaseModel):
     message: str

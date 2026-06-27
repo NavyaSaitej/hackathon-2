@@ -19,7 +19,6 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from models import Deck
 from scraper import process_video
 import gc
-import json
 import time
 import asyncio
 
@@ -28,6 +27,7 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from google.adk.agents import Agent
+from google.adk.models.google_llm import GoogleLlm
 from google.adk.runners import Runner
 from google.adk.sessions import InMemorySessionService
 from google.genai.types import Content, Part
@@ -134,7 +134,16 @@ OUTPUT FORMAT (strict JSON, no markdown fences):
     }
   ]
 }
+7. Only JSON is allowed. No markdown.
+
 """
+
+quiz_agent = Agent(
+    name="quiz_agent",
+    model=GoogleLlm(model_name=MODEL_ID),
+    instruction=SYSTEM_PROMPT,
+    output_schema=Deck
+)
 
 
 def determine_card_count(transcript: str) -> int:

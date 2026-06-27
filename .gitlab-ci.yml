@@ -1,36 +1,32 @@
 stages:
-  - lint
-  - format
+  - lint-and-format
+  - test
   - deadcode
   - security
   - deploy
 
-lint:frontend:
-  stage: lint
+lint-and-format:frontend:
+  stage: lint-and-format
   script:
-    - npm install @biomejs/biome
+    - npm install @biomejs/biome prettier
     - npx @biomejs/biome check frontend/js/
-  allow_failure: false
-
-lint:backend:
-  stage: lint
-  script:
-    - python -m pip install ruff
-    - python -m ruff check backend/
-  allow_failure: false
-
-format:frontend:
-  stage: format
-  script:
-    - npm install prettier
     - npx prettier --check "frontend/**/*.{js,css,html}"
   allow_failure: false
 
-format:backend:
-  stage: format
+lint-and-format:backend:
+  stage: lint-and-format
   script:
     - python -m pip install ruff
+    - python -m ruff check backend/
     - python -m ruff format --check backend/
+  allow_failure: false
+
+test:backend:
+  stage: test
+  script:
+    - python -m pip install -r backend/requirements.txt
+    - python -m pip install pytest pytest-asyncio
+    - python -m pytest backend/
   allow_failure: false
 
 deadcode:backend:
