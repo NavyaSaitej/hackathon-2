@@ -10,7 +10,7 @@ lint-and-format:frontend:
   script:
     - npm install @biomejs/biome prettier
     - npx @biomejs/biome check frontend/js/
-    - npx prettier --check "frontend/**/*.{js,css,html}"
+    - npx prettier --check 'frontend/**/*.{js,css,html}'
   allow_failure: false
 
 lint-and-format:backend:

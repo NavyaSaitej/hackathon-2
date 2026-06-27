@@ -8,7 +8,17 @@
     "format": "npx prettier --write 'frontend/**/*.{js,css,html}'",
     "serve": "python -m http.server 8000 -d frontend"
   },
-  "keywords": ["flashcards", "quiz", "youtube", "education", "ai"],
+  "keywords": [
+    "flashcards",
+    "quiz",
+    "youtube",
+    "education",
+    "ai"
+  ],
   "author": "Navya Sai Tej",
-  "license": "GPL-3.0"
+  "license": "GPL-3.0",
+  "dependencies": {
+    "@biomejs/biome": "^2.5.1",
+    "prettier": "^3.8.5"
+  }
 }
