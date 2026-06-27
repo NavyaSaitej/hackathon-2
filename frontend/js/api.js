@@ -8,7 +8,7 @@
 // Backend URL — update for production
 const API_BASE =
   window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-    ? 'http://localhost:8080'
+    ? 'http://localhost:8000'
     : ''; // Use relative path on Vercel
 
 const APP_SECRET = 'quickcards-dev-secret'; // Must match backend .env
