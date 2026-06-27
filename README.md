@@ -2,7 +2,7 @@
 
 This is the QuickCards application - an AI-powered YouTube-to-Quiz Flashcard Generator. It transforms any educational YouTube video into an interactive multiple-choice quiz deck, allowing users to rapidly assess their learning and review content with contextual timestamp links straight to the video.
 
-Website Link:- https://hackathon-2-navyasaitejs-projects.vercel.app
+Website Link:- https://hackathon-2-nine-pied.vercel.app
 
 ## Features
 
@@ -96,7 +96,7 @@ Then open: `http://localhost:5500`
 
 No build step is required for the frontend. The project is a static web application and can be deployed directly to Vercel, GitHub Pages, or GitLab Pages. The backend is designed to be deployed as serverless functions on Vercel or as a standalone service on Render.
 
-Production deployment: https://hackathon-2-navyasaitejs-projects.vercel.app
+Production deployment: https://hackathon-2-nine-pied.vercel.app
 
 ## Project Structure
 
