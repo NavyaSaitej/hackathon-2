@@ -7,6 +7,7 @@ stages:
 
 lint-and-format:frontend:
   stage: lint-and-format
+  image: node:20-alpine
   script:
     - npm install --no-save @biomejs/biome prettier
     - npx --yes @biomejs/biome check frontend/js/
@@ -15,6 +16,7 @@ lint-and-format:frontend:
 
 lint-and-format:backend:
   stage: lint-and-format
+  image: python:3.12-slim
   script:
     - python -m pip install ruff
     - python -m ruff check backend/
@@ -23,6 +25,7 @@ lint-and-format:backend:
 
 test:backend:
   stage: test
+  image: python:3.12-slim
   script:
     - python -m pip install -r backend/requirements.txt
     - python -m pip install pytest pytest-asyncio
@@ -31,6 +34,7 @@ test:backend:
 
 deadcode:backend:
   stage: deadcode
+  image: python:3.12-slim
   script:
     - python -m pip install vulture
     - python -m vulture backend/ --exclude backend/venv --min-confidence 80
@@ -38,6 +42,7 @@ deadcode:backend:
 
 security:backend:
   stage: security
+  image: python:3.12-slim
   script:
     - python -m pip install bandit
     - python -m bandit -r backend/ -x backend/venv -s B101,B310
@@ -45,6 +50,7 @@ security:backend:
 
 pages:
   stage: deploy
+  image: python:3.12-slim
   script:
     - python -c "import shutil, os; os.makedirs('public', exist_ok=True); shutil.copytree('frontend', 'public', dirs_exist_ok=True)"
   artifacts:
