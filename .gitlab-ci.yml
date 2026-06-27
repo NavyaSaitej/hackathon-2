@@ -8,9 +8,9 @@ stages:
 lint-and-format:frontend:
   stage: lint-and-format
   script:
-    - npm install @biomejs/biome prettier
-    - npx @biomejs/biome check frontend/js/
-    - npx prettier --check 'frontend/**/*.{js,css,html}'
+    - npm install --no-save @biomejs/biome prettier
+    - npx --yes @biomejs/biome check frontend/js/
+    - npx --yes prettier --check frontend/js/ frontend/style.css frontend/index.html frontend/sw.js
   allow_failure: false
 
 lint-and-format:backend:
